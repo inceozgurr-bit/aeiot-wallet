@@ -1,0 +1,21 @@
+# Xcode
+ios/AEIOTWallet.xcodeproj/
+ios/*.xcworkspace/
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/lib/
+contracts/broadcast/
+
+# macOS
+.DS_Store
+
+# Secrets — never commit. Keys live in the macOS Keychain.
+.env
+*.xcconfig
+secrets*

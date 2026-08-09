@@ -1,0 +1,34 @@
+name: AEIOTWallet
+options:
+  bundleIdPrefix: com.aeiot
+  deploymentTarget:
+    iOS: "26.0"
+  # English is the base language, so any device that is not Turkish gets English.
+  developmentLanguage: en
+packages:
+  web3swift:
+    url: https://github.com/web3swift-team/web3swift
+    from: 3.3.0
+targets:
+  AEIOTWallet:
+    type: application
+    platform: iOS
+    sources: [AEIOTWallet]
+    dependencies:
+      - package: web3swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aeiot.wallet
+        DEVELOPMENT_TEAM: JMLSCK7G9U
+        CODE_SIGN_STYLE: Automatic
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDevelopmentRegion: en
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        # Black launch screen with just the mark, centred.
+        INFOPLIST_KEY_UILaunchScreen_BackgroundColor: LaunchBackground
+        INFOPLIST_KEY_UILaunchScreen_ImageName: LaunchLogo
+        INFOPLIST_KEY_NSFaceIDUsageDescription: Face ID protects your wallet and confirms transactions.
+        INFOPLIST_KEY_NSCameraUsageDescription: The camera is used to scan recipient QR codes.
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.10"

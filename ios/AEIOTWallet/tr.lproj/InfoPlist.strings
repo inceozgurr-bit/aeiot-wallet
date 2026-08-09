@@ -1,0 +1,3 @@
+/* Sistem izin diyalogları. Anahtarlar Info.plist anahtarlarıyla aynı olmalı. */
+"NSFaceIDUsageDescription" = "Face ID cüzdanını korur ve işlemleri onaylar.";
+"NSCameraUsageDescription" = "Kamera, alıcının QR kodunu taramak için kullanılır.";

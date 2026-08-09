@@ -1,0 +1,22 @@
+{
+  "images": [
+    {
+      "filename": "logo_xrp.png",
+      "idiom": "universal"
+    },
+    {
+      "filename": "logo_xrp_dark.png",
+      "idiom": "universal",
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ]
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}
