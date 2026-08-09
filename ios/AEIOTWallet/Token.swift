@@ -48,6 +48,10 @@ struct Token: Identifiable, Hashable {
         Token(chain: .ethereum, symbol: "WBTC", name: "Wrapped Bitcoin",
               contract: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
               decimals: 8, coingeckoID: "wrapped-bitcoin", logo: "logo_wbtc"),
+        // Swaps route SHIB → WETH → stablecoin; measured 0.65% under spot.
+        Token(chain: .ethereum, symbol: "SHIB", name: "Shiba Inu",
+              contract: "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
+              decimals: 18, coingeckoID: "shiba-inu", logo: "logo_shib"),
     ]
 
     private static let arbitrumTokens: [Token] = [
@@ -96,6 +100,11 @@ struct Token: Identifiable, Hashable {
         Token(chain: .bnb, symbol: "USDC", name: "USD Coin",
               contract: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
               decimals: 18, coingeckoID: "usd-coin", logo: "logo_usdc"),
+        // The BSC-bridged SHIB, a different contract from Ethereum's. Its
+        // PancakeSwap route measured 0.34% under spot.
+        Token(chain: .bnb, symbol: "SHIB", name: "Shiba Inu",
+              contract: "0x2859e4544C4bB03966803b044A93563Bd2D0DD4D",
+              decimals: 18, coingeckoID: "shiba-inu", logo: "logo_shib"),
     ]
 
     // On Solana `contract` holds the SPL mint address instead of an 0x contract.
@@ -134,7 +143,7 @@ struct Token: Identifiable, Hashable {
     /// Display order: our own coin pinned to the top, then roughly by how
     /// widely held each coin is. Anything unlisted falls to the bottom.
     private static let displayOrder = [
-        "AEIOT", "BTC", "ETH", "USDT", "USDC", "XRP", "SOL", "BNB", "cbBTC", "WBTC", "POL",
+        "AEIOT", "BTC", "ETH", "USDT", "USDC", "XRP", "SOL", "BNB", "SHIB", "cbBTC", "WBTC", "POL",
     ]
 
     /// One entry per coin, so ETH does not take four rows in the list.
