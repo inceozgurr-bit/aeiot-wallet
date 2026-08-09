@@ -18,10 +18,31 @@ enum HistoryService {
         await recentTransfers(evm: address, bitcoin: [], solana: nil, xrp: nil)
     }
 
+    /// Recent history, reused for a few minutes. Rebuilding it costs about
+    /// thirty requests across nine networks, and past transactions do not change
+    /// — only new ones arrive, which a refresh a moment later would not show
+    /// anyway. Sending or swapping bypasses this by design.
+    private actor Recent {
+        private var byKey: [String: (items: [Activity], at: Date)] = [:]
+
+        func fresh(_ key: String, within seconds: TimeInterval) -> [Activity]? {
+            guard let hit = byKey[key], Date().timeIntervalSince(hit.at) < seconds else { return nil }
+            return hit.items
+        }
+
+        func store(_ items: [Activity], for key: String) {
+            byKey[key] = (items, Date())
+        }
+    }
+
+    private static let recent = Recent()
+
     /// History across every network the wallet holds, newest first. Each network
     /// is queried in parallel and one that fails simply contributes nothing.
     static func recentTransfers(evm: String?, bitcoin: [String],
                                 solana: String?, xrp: String?) async -> [Activity] {
+        let key = [evm, solana, xrp, bitcoin.first].compactMap { $0 }.joined(separator: "|")
+        if let cached = await recent.fresh(key, within: 180) { return cached }
         let merged = await withTaskGroup(of: [Activity].self) { group in
             if let evm {
                 for chain in Chain.all where chain.blockscout != nil {
@@ -41,7 +62,11 @@ enum HistoryService {
             for await chunk in group { all += chunk }
             return all
         }
-        return merged.sorted { $0.date > $1.date }
+        let sorted = merged.sorted { $0.date > $1.date }
+        // Only remember a real answer: if every network failed, caching the
+        // empty result would hide the history for the next three minutes.
+        if !sorted.isEmpty { await recent.store(sorted, for: key) }
+        return sorted
     }
 
     /// Bitcoin history. Blockstream returns full transactions, so the net effect

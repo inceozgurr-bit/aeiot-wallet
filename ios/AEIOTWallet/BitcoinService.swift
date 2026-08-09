@@ -48,6 +48,11 @@ enum BitcoinService {
     /// Queried in small batches: firing all forty at once gets some of them
     /// rate-limited, and a refused request is indistinguishable from an empty
     /// address — which showed up as a balance that was quietly too low.
+    /// Every address is checked, deliberately. Stopping at the first empty batch
+    /// would be faster, but the list runs receive-addresses then change-addresses
+    /// — so an empty run of receive addresses would skip the change branch, where
+    /// the leftovers of past sends live, and the balance would read low. The gap
+    /// limit exists for exactly this reason.
     static func balance(addresses: [String]) async -> Decimal {
         var total = Decimal.zero
         for start in stride(from: 0, to: addresses.count, by: batchSize) {
