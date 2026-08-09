@@ -42,6 +42,36 @@ enum BitcoinService {
         return Decimal(funded - spent) / satsPerBTC
     }
 
+    /// Total across a wallet's addresses. Bitcoin spreads funds over many
+    /// addresses, so a single-address balance would understate the wallet.
+    /// Queried in parallel; an address that fails contributes zero.
+    static func balance(addresses: [String]) async -> Decimal {
+        await withTaskGroup(of: Decimal.self) { group in
+            for address in addresses {
+                group.addTask { (try? await balance(address: address)) ?? 0 }
+            }
+            var total = Decimal.zero
+            for await amount in group { total += amount }
+            return total
+        }
+    }
+
+    /// Spendable coins across every address, each paired with the key that can
+    /// sign it — inputs from different addresses need different signatures.
+    static func spendableCoins(for keypairs: [BitcoinKey.Keypair]) async -> [(utxo: UTXO, key: BitcoinKey.Keypair)] {
+        await withTaskGroup(of: [(UTXO, BitcoinKey.Keypair)].self) { group in
+            for key in keypairs {
+                group.addTask {
+                    let found = (try? await utxos(address: key.address)) ?? []
+                    return found.map { ($0, key) }
+                }
+            }
+            var all: [(UTXO, BitcoinKey.Keypair)] = []
+            for await chunk in group { all += chunk }
+            return all.map { (utxo: $0.0, key: $0.1) }
+        }
+    }
+
     static func utxos(address: String) async throws -> [UTXO] {
         let list: [[String: Any]] = try await get("/address/\(address)/utxo")
         return list.compactMap { entry in

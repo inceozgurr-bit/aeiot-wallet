@@ -23,8 +23,21 @@ enum BitcoinKey {
         }
     }
 
+    /// How far ahead to look for used addresses. Twenty is the BIP44 standard
+    /// every other wallet follows, so balances match what they show.
+    static let gapLimit = 20
+
     static func keypair(fromSeed seed: Data) -> Keypair? { derive(seed: seed, path: receivePath) }
     static func changeKeypair(fromSeed seed: Data) -> Keypair? { derive(seed: seed, path: changePath) }
+
+    /// The first `count` addresses of a branch. Bitcoin wallets spread funds
+    /// across many addresses, so scanning only the first one hides balances.
+    static func keypairs(fromSeed seed: Data, change: Bool = false, count: Int = gapLimit) -> [Keypair] {
+        let branch = change ? 1 : 0
+        return (0..<count).compactMap { index in
+            derive(seed: seed, path: "m/84'/0'/0'/\(branch)/\(index)")
+        }
+    }
 
     private static func derive(seed: Data, path: String) -> Keypair? {
         guard let node = HDNode(seed: seed)?.derive(path: path),
