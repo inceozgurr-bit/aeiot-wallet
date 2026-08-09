@@ -91,7 +91,9 @@ enum BitcoinService {
 
     // MARK: Sending
 
-    static func send(from keypair: BitcoinKey.Keypair, change changeKeypair: BitcoinKey.Keypair,
+    /// Spends from any of the wallet's addresses. `keys` are the receiving and
+    /// change keys to scan; `changeKeypair` receives what is left over.
+    static func send(keys: [BitcoinKey.Keypair], change changeKeypair: BitcoinKey.Keypair,
                      to recipient: String, amount: Decimal) async throws -> String {
         guard let outputScript = BitcoinKey.outputScript(for: recipient) else {
             throw BitcoinError.invalidAddress
@@ -99,16 +101,16 @@ enum BitcoinService {
         let target = NSDecimalNumber(decimal: amount * satsPerBTC).uint64Value
         guard target >= dustLimit else { throw BitcoinError.dustAmount }
 
-        let available = try await utxos(address: keypair.address).sorted { $0.value > $1.value }
+        let available = await spendableCoins(for: keys).sorted { $0.utxo.value > $1.utxo.value }
         let rate = await feeRate()
 
         // Pick inputs largest-first until the amount plus its own fee is covered.
-        var chosen: [UTXO] = []
+        var chosen: [(utxo: UTXO, key: BitcoinKey.Keypair)] = []
         var total: UInt64 = 0
         var fee: UInt64 = 0
-        for utxo in available {
-            chosen.append(utxo)
-            total += utxo.value
+        for coin in available {
+            chosen.append(coin)
+            total += coin.utxo.value
             // P2WPKH sizes: 10 base + 68 per input + 31 per output (two outputs).
             let vsize = 10 + 68 * chosen.count + 31 * 2
             fee = UInt64((Double(vsize) * rate).rounded(.up))
@@ -127,7 +129,7 @@ enum BitcoinService {
             outputs.append((change, changeScript))
         }
 
-        let raw = try BitcoinTransaction.build(inputs: chosen, outputs: outputs, keypair: keypair)
+        let raw = try BitcoinTransaction.build(inputs: chosen, outputs: outputs)
         return try await postTransaction(hex: raw)
     }
 

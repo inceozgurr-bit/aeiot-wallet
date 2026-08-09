@@ -24,8 +24,11 @@ struct WalletInfo: Codable, Identifiable, Hashable {
     var solanaAddress: String?
     /// Same phrase, XRP's own derivation path and address format.
     var xrpAddress: String?
-    /// Native SegWit (bc1…) receiving address.
+    /// Native SegWit (bc1…) receiving address — the first one, shown for receiving.
     var bitcoinAddress: String?
+    /// All scanned Bitcoin addresses (receive + change). Balances must sum over
+    /// these, otherwise a wallet imported from elsewhere looks emptier than it is.
+    var bitcoinAddresses: [String]?
     var id: String { address }
 }
 
@@ -94,7 +97,8 @@ final class WalletStore {
                 address: addr,
                 solanaAddress: seed.flatMap(SolanaKey.keypair(fromSeed:))?.address,
                 xrpAddress: seed.flatMap(XRPKey.keypair(fromSeed:))?.address,
-                bitcoinAddress: seed.flatMap(BitcoinKey.keypair(fromSeed:))?.address))
+                bitcoinAddress: seed.flatMap(BitcoinKey.keypair(fromSeed:))?.address,
+                bitcoinAddresses: seed.map(Self.bitcoinAddressSet(seed:))))
         }
         activeAddress = addr
         persist()
@@ -118,6 +122,15 @@ final class WalletStore {
         if activeAddress == wallet.address { activeAddress = wallets.first?.address }
         if wallets.isEmpty { isLocked = false }
         persist()
+    }
+
+    /// Every address to check balances on. One for most networks; Bitcoin
+    /// spreads funds across many, so all of them are returned.
+    func addresses(for chain: Chain) -> [String] {
+        if case .bitcoin = chain.kind {
+            if let scanned = activeWallet?.bitcoinAddresses, !scanned.isEmpty { return scanned }
+        }
+        return address(for: chain).map { [$0] } ?? []
     }
 
     /// Which address this network uses. Every EVM chain shares the 0x… one;
@@ -146,8 +159,29 @@ final class WalletStore {
         wallets[index].solanaAddress = SolanaKey.keypair(fromSeed: seed)?.address
         wallets[index].xrpAddress = XRPKey.keypair(fromSeed: seed)?.address
         wallets[index].bitcoinAddress = BitcoinKey.keypair(fromSeed: seed)?.address
+        wallets[index].bitcoinAddresses = Self.bitcoinAddressSet(seed: seed)
         persist()
         return true
+    }
+
+
+    /// Receive and change addresses within the standard gap limit.
+    private static func bitcoinAddressSet(seed: Data) -> [String] {
+        (BitcoinKey.keypairs(fromSeed: seed) + BitcoinKey.keypairs(fromSeed: seed, change: true))
+            .map(\.address)
+    }
+
+    /// Bitcoin needs every key that might hold coins, plus one for the change.
+    func loadBitcoinKeys() async throws -> (keys: [BitcoinKey.Keypair], change: BitcoinKey.Keypair) {
+        guard let address = activeAddress,
+              let mnemonic = Keychain.load(key: "wallet.mnemonic.\(address)",
+                                           prompt: String.loc("Authorize this transfer")),
+              let seed = BIP39.seedFromMmemonics(mnemonic),
+              let change = BitcoinKey.changeKeypair(fromSeed: seed) else {
+            throw WalletError.keystoreUnavailable
+        }
+        let keys = BitcoinKey.keypairs(fromSeed: seed) + BitcoinKey.keypairs(fromSeed: seed, change: true)
+        return (keys, change)
     }
 
     /// Bitcoin needs both the spending key and the change key.

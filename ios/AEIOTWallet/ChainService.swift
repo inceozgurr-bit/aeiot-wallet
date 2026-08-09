@@ -23,7 +23,13 @@ actor ChainService {
         return connected
     }
 
-    func balance(of token: Token, owner: String) async throws -> Decimal {
+    /// `owners` is a list because Bitcoin spreads a wallet's funds across many
+    /// addresses; every other network passes a single one.
+    func balance(of token: Token, owners: [String]) async throws -> Decimal {
+        if case .bitcoin = token.chain.kind {
+            return await BitcoinService.balance(addresses: owners)
+        }
+        guard let owner = owners.first else { throw WalletError.invalidAddress }
         switch token.chain.kind {
         case .solana:
             if let mint = token.contract {

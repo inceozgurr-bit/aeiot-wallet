@@ -8,13 +8,12 @@ enum BitcoinTransaction {
     private static let sequence: UInt32 = 0xFFFF_FFFD
     private static let sighashAll: UInt32 = 1
 
-    static func build(inputs: [BitcoinService.UTXO],
-                      outputs: [(value: UInt64, script: [UInt8])],
-                      keypair: BitcoinKey.Keypair) throws -> String {
-        let scriptCode = p2wpkhScriptCode(hash160: keypair.hash160)
-
+    /// Each input carries the key that can sign it: a wallet's coins sit on
+    /// many addresses, and every address has its own key.
+    static func build(inputs: [(utxo: BitcoinService.UTXO, key: BitcoinKey.Keypair)],
+                      outputs: [(value: UInt64, script: [UInt8])]) throws -> String {
         // BIP143 reuses these three digests across every input.
-        let hashPrevouts = doubleSHA256(inputs.flatMap { outpoint($0) })
+        let hashPrevouts = doubleSHA256(inputs.flatMap { outpoint($0.utxo) })
         let hashSequence = doubleSHA256(inputs.flatMap { _ in littleEndian(sequence) })
         let hashOutputs = doubleSHA256(outputs.flatMap { output in
             littleEndian(output.value) + varint(output.script.count) + output.script
@@ -26,23 +25,23 @@ enum BitcoinTransaction {
             preimage += littleEndian(UInt32(2))            // version
             preimage += hashPrevouts
             preimage += hashSequence
-            preimage += outpoint(input)
-            preimage += scriptCode
-            preimage += littleEndian(input.value)
+            preimage += outpoint(input.utxo)
+            preimage += p2wpkhScriptCode(hash160: input.key.hash160)
+            preimage += littleEndian(input.utxo.value)
             preimage += littleEndian(sequence)
             preimage += hashOutputs
             preimage += littleEndian(UInt32(0))            // locktime
             preimage += littleEndian(sighashAll)
 
             let digest = doubleSHA256(preimage)
-            let (serialized, _) = SECP256K1.signForRecovery(hash: Data(digest), privateKey: keypair.privateKey)
+            let (serialized, _) = SECP256K1.signForRecovery(hash: Data(digest), privateKey: input.key.privateKey)
             guard let raw = serialized, raw.count >= 64 else {
                 throw BitcoinError.api("Signing failed")
             }
             // Same DER + low-S rule as XRP; Bitcoin then appends the hash type.
             let der = XRPTransaction.derSignature(r: Array(raw[0..<32]), s: Array(raw[32..<64]))
             let signature = der + [UInt8(sighashAll)]
-            let publicKey = [UInt8](keypair.publicKey)
+            let publicKey = [UInt8](input.key.publicKey)
             witnesses.append(varint(2) + varint(signature.count) + signature
                              + varint(publicKey.count) + publicKey)
         }
@@ -52,7 +51,7 @@ enum BitcoinTransaction {
         tx += [0x00, 0x01]                                 // SegWit marker and flag
         tx += varint(inputs.count)
         for input in inputs {
-            tx += outpoint(input)
+            tx += outpoint(input.utxo)
             tx += [0x00]                                   // empty scriptSig for SegWit
             tx += littleEndian(sequence)
         }

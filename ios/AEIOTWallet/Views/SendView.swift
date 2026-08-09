@@ -355,9 +355,9 @@ struct SendView: View {
                 // Reading the seed triggers the device biometric/passcode check (Keychain ACL).
                 let hash: String
                 if isBitcoin {
-                    let keys = try await wallet.loadBitcoinKeypairs()
+                    let keys = try await wallet.loadBitcoinKeys()
                     hash = try await BitcoinService.send(
-                        from: keys.spend, change: keys.change, to: recipient,
+                        keys: keys.keys, change: keys.change, to: recipient,
                         amount: Decimal(string: normalizedAmount) ?? 0)
                 } else if isXRP {
                     let keypair = try await wallet.loadXRPKeypair()

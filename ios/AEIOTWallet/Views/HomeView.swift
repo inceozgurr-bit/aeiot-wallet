@@ -317,10 +317,11 @@ struct HomeView: View {
         // One request per coin across six networks — serial would take seconds.
         balances = await withTaskGroup(of: (String, Decimal)?.self) { group in
             for token in Token.all {
-                // Solana uses its own address, and older wallets do not have one yet.
-                guard let owner = wallet.address(for: token.chain) else { continue }
+                // Each network has its own address; Bitcoin has a whole set of them.
+                let owners = wallet.addresses(for: token.chain)
+                guard !owners.isEmpty else { continue }
                 group.addTask {
-                    guard let balance = try? await ChainService.shared.balance(of: token, owner: owner)
+                    guard let balance = try? await ChainService.shared.balance(of: token, owners: owners)
                     else { return nil }
                     return (token.id, balance)
                 }
