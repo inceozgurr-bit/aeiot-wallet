@@ -93,6 +93,7 @@ struct OnboardingView: View {
             }
             // A screen recording would capture the phrase silently.
             .hiddenWhileRecording(screenGuard)
+            .onAppear { prepareQuiz(wordCount: words.count) }
 
             if screenGuard.screenshotTaken {
                 Label("A screenshot was taken. Photos are not a safe place for these words — delete it.",
@@ -102,9 +103,43 @@ struct OnboardingView: View {
                     .multilineTextAlignment(.center)
             }
 
+            // Asking a few words back is what makes people actually write them
+            // down — losing the phrase is the most common way funds disappear.
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Confirm you wrote them down")
+                    .font(.subheadline.weight(.medium))
+                ForEach(quizIndices, id: \.self) { index in
+                    HStack(spacing: 10) {
+                        Text("\(index + 1).")
+                            .font(.callout.monospaced())
+                            .foregroundStyle(.secondary)
+                            .frame(width: 28, alignment: .trailing)
+                        TextField("word", text: Binding(
+                            get: { quizAnswers[index] ?? "" },
+                            set: { quizAnswers[index] = $0 }
+                        ))
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .font(.callout.monospaced())
+                        .padding(8)
+                        .glassEffect(.regular, in: .rect(cornerRadius: 10))
+                    }
+                }
+                if quizFailed {
+                    Text("Those do not match. Check the words above.")
+                        .font(.caption)
+                        .foregroundStyle(Color.appAccent)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
             Spacer()
             Button {
                 Haptic.tap()
+                guard quizPasses(words) else {
+                    quizFailed = true
+                    return
+                }
                 confirmBackup(phrase)
             } label: {
                 Text(isWorking ? String.loc("Setting Up…") : String.loc("I Wrote It Down — Continue"))
@@ -153,6 +188,21 @@ struct OnboardingView: View {
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .presentationBackground(.thinMaterial)
+    }
+
+    /// Three words, drawn once so they do not reshuffle while typing.
+    private func prepareQuiz(wordCount: Int) {
+        guard quizIndices.isEmpty, wordCount > 0 else { return }
+        quizIndices = Array(0..<wordCount).shuffled().prefix(3).sorted()
+    }
+
+    private func quizPasses(_ words: [String]) -> Bool {
+        quizIndices.allSatisfy { index in
+            let typed = (quizAnswers[index] ?? "")
+                .trimmingCharacters(in: .whitespaces)
+                .lowercased()
+            return typed == words[index].lowercased()
+        }
     }
 
     private func createWallet() {

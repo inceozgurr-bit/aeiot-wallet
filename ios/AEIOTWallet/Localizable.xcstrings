@@ -400,6 +400,16 @@
         }
       }
     },
+    "Confirm you wrote them down": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yazdığını doğrula"
+          }
+        }
+      }
+    },
     "Contact": {
       "localizations": {
         "tr": {
@@ -1498,6 +1508,16 @@
         }
       }
     },
+    "Those do not match. Check the words above.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleşmiyor. Yukarıdaki kelimeleri kontrol et."
+          }
+        }
+      }
+    },
     "To": {
       "localizations": {
         "tr": {
@@ -1825,6 +1845,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kurtarma cümlelerin, cüzdan adların ve kayıtlı adreslerin bu cihazın Keychain'inde ve yerel uygulama ayarlarında saklanır. Hiçbir yere yüklenmez."
+          }
+        }
+      }
+    },
+    "word": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kelime"
           }
         }
       }

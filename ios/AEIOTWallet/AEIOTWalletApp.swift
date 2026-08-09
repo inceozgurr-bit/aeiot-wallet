@@ -11,6 +11,9 @@ struct AEIOTWalletApp: App {
     @AppStorage("requireBiometricUnlock") private var requireBiometricUnlock = true
     /// Checked once at launch: a jailbroken device weakens Keychain protection.
     @State private var showIntegrityWarning = DeviceIntegrity.isCompromised
+    /// iOS dismisses its launch screen the moment the app is ready, which is
+    /// too fast to register. This holds the same image a little longer.
+    @State private var showSplash = true
 
     init() {
         // Before any view reads a string, so the first frame is already translated.
@@ -35,6 +38,19 @@ struct AEIOTWalletApp: App {
             .environment(addressBook)
             .environment(\.locale, Locale(identifier: appLanguage.bundleCode))
             .tint(.appAccent)
+            .overlay {
+                if showSplash {
+                    ZStack {
+                        Color.black.ignoresSafeArea()
+                        Image("LaunchLogo")
+                    }
+                    .transition(.opacity)
+                }
+            }
+            .task {
+                try? await Task.sleep(for: .seconds(1))
+                withAnimation(.easeOut(duration: 0.35)) { showSplash = false }
+            }
             .alert("This device looks jailbroken", isPresented: $showIntegrityWarning) {
                 Button("I understand", role: .cancel) {}
             } message: {
