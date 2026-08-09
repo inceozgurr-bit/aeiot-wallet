@@ -16,8 +16,21 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>aeiot.app001</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>aeiot</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>ReownProjectID</key>
+	<string>$(REOWN_PROJECT_ID)</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

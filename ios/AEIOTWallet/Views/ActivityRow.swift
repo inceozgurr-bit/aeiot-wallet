@@ -106,7 +106,7 @@ struct ActivityDetailView: View {
 
     private func detailRow(_ label: LocalizedStringKey, _ value: String) -> some View {
         HStack {
-            Text(label).foregroundStyle(.secondary)
+            Text(label).foregroundStyle(.secondary).oneLine()
             Spacer()
             Text(value).fontWeight(.medium)
         }

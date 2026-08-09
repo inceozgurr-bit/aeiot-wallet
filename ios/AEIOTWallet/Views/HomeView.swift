@@ -9,8 +9,6 @@ struct HomeView: View {
     @State private var showSwap = false
     @State private var showSettings = false
     @State private var selectedGroup: TokenGroup?
-    @State private var showRename = false
-    @State private var renameText = ""
     @State private var showManage = false
     @State private var balances: [String: Decimal] = [:]
     @State private var prices: [String: Double] = [:]
@@ -63,13 +61,6 @@ struct HomeView: View {
             .sheet(item: $selectedActivity) { ActivityDetailView(item: $0) }
             .sheet(isPresented: $showManage) { WalletManageView() }
             .sheet(isPresented: $showSwap) { SwapView { refreshTrigger += 1 } }
-            .alert("Rename Wallet", isPresented: $showRename) {
-                TextField("Name", text: $renameText)
-                Button("Save") {
-                    if let active = wallet.activeWallet { wallet.rename(active, to: renameText) }
-                }
-                Button("Cancel", role: .cancel) {}
-            }
         }
     }
 
@@ -121,23 +112,15 @@ struct HomeView: View {
         }
     }
 
+    /// Read-only here — the name is edited in Manage Wallets, next to the wallet
+    /// it belongs to.
     private var titleBar: some View {
-        Button {
-            Haptic.tap()
-            renameText = wallet.activeWallet?.name ?? ""
-            showRename = true
-        } label: {
-            HStack(spacing: 8) {
-                Text(wallet.activeWallet?.name ?? "AEIOT Wallet")
-                    .font(.largeTitle.bold())
-                    .foregroundStyle(.primary)
-                Image(systemName: "pencil")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                Spacer()
-            }
+        HStack(spacing: 8) {
+            Text(wallet.activeWallet?.name ?? "AEIOT Wallet")
+                .font(.largeTitle.bold())
+                .oneLine()
+            Spacer()
         }
-        .buttonStyle(.plain)
         .padding(.top, 8)
     }
 
@@ -158,6 +141,9 @@ struct HomeView: View {
             }
             Text(hideBalances ? "••••" : totalUSD.formatted(.currency(code: "USD")))
                 .font(.system(size: 40, weight: .bold, design: .rounded))
+                // A balance must never wrap or be cut off, so it shrinks far
+                // enough to keep even a long figure on one line.
+                .oneLine(0.4)
                 .contentTransition(.numericText())
         }
         .frame(maxWidth: .infinity)
@@ -171,7 +157,7 @@ struct HomeView: View {
                 path.append(.send)
             } label: {
                 Label("Send", systemImage: "arrow.up")
-                    .font(.subheadline).frame(maxWidth: .infinity).padding(.vertical, 8)
+                    .font(.subheadline).oneLine().frame(maxWidth: .infinity).padding(.vertical, 8)
             }
             .buttonStyle(.glassProminent)
 
@@ -180,7 +166,7 @@ struct HomeView: View {
                 showReceive = true
             } label: {
                 Label("Receive", systemImage: "arrow.down")
-                    .font(.subheadline).frame(maxWidth: .infinity).padding(.vertical, 8)
+                    .font(.subheadline).oneLine().frame(maxWidth: .infinity).padding(.vertical, 8)
             }
             .buttonStyle(.glass)
 
@@ -189,7 +175,7 @@ struct HomeView: View {
                 showSwap = true
             } label: {
                 Label("Swap", systemImage: "arrow.left.arrow.right")
-                    .font(.subheadline).frame(maxWidth: .infinity).padding(.vertical, 8)
+                    .font(.subheadline).oneLine().frame(maxWidth: .infinity).padding(.vertical, 8)
             }
             .buttonStyle(.glass)
         }
@@ -227,6 +213,7 @@ struct HomeView: View {
                 } else if loaded {
                     Text(amount, format: .number.precision(.fractionLength(0...6)))
                         .font(.headline.monospacedDigit())
+                        .oneLine(0.5)
                 } else {
                     Text("···").foregroundStyle(.tertiary)
                 }
@@ -237,6 +224,7 @@ struct HomeView: View {
                          format: .currency(code: "USD"))
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .oneLine(0.6)
                 } else if group.primary.coingeckoID == nil {
                     Text("No market yet").font(.caption).foregroundStyle(.tertiary)
                 }
@@ -263,6 +251,7 @@ struct HomeView: View {
         }
         .font(.caption2)
         .foregroundStyle(.secondary)
+        .oneLine()
         .padding(.horizontal, 6)
         .padding(.vertical, 2)
         .background(.quaternary, in: .capsule)

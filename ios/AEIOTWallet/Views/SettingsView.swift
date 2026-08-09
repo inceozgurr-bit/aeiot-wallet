@@ -6,6 +6,12 @@ struct SettingsView: View {
     @AppStorage("appLanguage") private var appLanguage = AppLanguage.deviceDefault
     @AppStorage("requireBiometricUnlock") private var requireBiometricUnlock = true
     @State private var showLanguagePicker = false
+    @State private var showConnectedApps = false
+    @State private var connections = WalletConnectService.shared
+
+    /// One row of the language picker: 12pt padding above and below a body line,
+    /// plus its divider. Ten of these is how tall the popover is allowed to get.
+    private let languageRowHeight: CGFloat = 46
 
     var body: some View {
         NavigationStack {
@@ -15,6 +21,7 @@ struct SettingsView: View {
                     VStack(spacing: 18) {
                         appearanceCard
                         securityCard
+                        connectionsCard
                         aboutCard
                     }
                     .padding(20)
@@ -28,6 +35,33 @@ struct SettingsView: View {
                 }
             }
         }
+    }
+
+    // MARK: Connections
+
+    private var connectionsCard: some View {
+        Button {
+            Haptic.tap()
+            showConnectedApps = true
+        } label: {
+            HStack(spacing: 12) {
+                icon("link")
+                Text("Connected Apps").oneLine()
+                Spacer()
+                if !connections.sessions.isEmpty {
+                    Text("\(connections.sessions.count)")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                chevron
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .glassEffect(.regular, in: .rect(cornerRadius: 18))
+        .sheet(isPresented: $showConnectedApps) { ConnectedAppsView() }
     }
 
     // MARK: Appearance
@@ -44,7 +78,7 @@ struct SettingsView: View {
     private var themeRow: some View {
         HStack(spacing: 12) {
             icon(themeMode.icon)
-            Text(themeMode.label)
+            Text(themeMode.label).oneLine()
             Spacer()
             HStack(spacing: 4) {
                 ForEach(ThemeMode.allCases) { mode in
@@ -84,11 +118,12 @@ struct SettingsView: View {
         } label: {
             HStack(spacing: 12) {
                 icon("globe")
-                Text("Language")
+                Text("Language").oneLine()
                 Spacer()
                 Text(appLanguage.label)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+                    .oneLine()
                 chevron
             }
             .padding(.horizontal, 16)
@@ -104,35 +139,44 @@ struct SettingsView: View {
     }
 
     private var languagePicker: some View {
-        VStack(spacing: 0) {
-            ForEach(AppLanguage.allCases) { language in
-                Button {
-                    Haptic.tap()
-                    showLanguagePicker = false
-                    appLanguage = language
-                    Localization.apply(language)
-                } label: {
-                    HStack(spacing: 10) {
-                        Text(language.label)
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        Image(systemName: "checkmark")
-                            .font(.footnote.bold())
-                            .foregroundStyle(Color.appAccent)
-                            .opacity(language == appLanguage ? 1 : 0)
+        // Scrolls once the list outgrows the screen; stays still while it fits.
+        ScrollView {
+            VStack(spacing: 0) {
+                ForEach(AppLanguage.available) { language in
+                    Button {
+                        Haptic.tap()
+                        showLanguagePicker = false
+                        appLanguage = language
+                        Localization.apply(language)
+                    } label: {
+                        HStack(spacing: 10) {
+                            Text(language.label)
+                                .foregroundStyle(.primary)
+                                .oneLine()
+                            Spacer()
+                            Image(systemName: "checkmark")
+                                .font(.footnote.bold())
+                                .foregroundStyle(Color.appAccent)
+                                .opacity(language == appLanguage ? 1 : 0)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .contentShape(.rect)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
+                    .buttonStyle(.plain)
 
-                if language != AppLanguage.allCases.last {
-                    Divider().padding(.leading, 16)
+                    if language != AppLanguage.available.last {
+                        Divider().padding(.leading, 16)
+                    }
                 }
             }
         }
-        .frame(width: 190)
+        .scrollBounceBehavior(.basedOnSize)
+        // Wide enough for the longest language name written in its own language
+        // ("Bahasa Indonesia") without shrinking it; tall enough for ten rows,
+        // after which the list scrolls instead of running off the screen.
+        .frame(width: 225)
+        .frame(maxHeight: 10 * languageRowHeight)
         // Without this iOS turns the popover into a full-width sheet on iPhone.
         .presentationCompactAdaptation(.popover)
     }

@@ -195,12 +195,19 @@ enum HistoryService {
             return []
         }
         let owner = address.lowercased()
-        let formatter = ISO8601DateFormatter()
+        // Blockscout stamps transfers with microseconds ("…T20:46:59.000000Z"),
+        // which the plain internet-date parser rejects — every row then fell back
+        // to "now", so the list showed one identical timestamp in random order.
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let plain = ISO8601DateFormatter()
         return root.items.prefix(25).compactMap { item -> Activity? in
             guard let decimalsString = item.token.decimals, let decimals = Int(decimalsString),
-                  let rawValue = item.total.value, let raw = Decimal(string: rawValue) else { return nil }
+                  let rawValue = item.total.value, let raw = Decimal(string: rawValue),
+                  // Showing a wrong date on a transfer is worse than omitting it.
+                  let date = fractional.date(from: item.timestamp)
+                      ?? plain.date(from: item.timestamp) else { return nil }
             let amount = raw / pow(10, decimals)
-            let date = formatter.date(from: item.timestamp) ?? .now
             return Activity(
                 chain: chain,
                 hash: item.transaction_hash,

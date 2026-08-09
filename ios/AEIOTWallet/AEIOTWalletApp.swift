@@ -14,6 +14,7 @@ struct AEIOTWalletApp: App {
     /// iOS dismisses its launch screen the moment the app is ready, which is
     /// too fast to register. This holds the same image a little longer.
     @State private var showSplash = true
+    @State private var walletConnect = WalletConnectService.shared
 
     init() {
         // Before any view reads a string, so the first frame is already translated.
@@ -37,19 +38,46 @@ struct AEIOTWalletApp: App {
             .environment(wallet)
             .environment(addressBook)
             .environment(\.locale, Locale(identifier: appLanguage.bundleCode))
+            // The chosen language overrides the device one, so iOS will not flip
+            // the layout for Arabic on its own.
+            .environment(\.layoutDirection, appLanguage.layoutDirection)
             .tint(.appAccent)
             .overlay {
                 if showSplash {
                     ZStack {
-                        Color.black.ignoresSafeArea()
+                        Color.black
                         Image("LaunchLogo")
                     }
+                    // The whole stack, not just the background: inside the safe
+                    // area the mark sits below the true centre, and iOS centres
+                    // the launch screen's copy on the full screen — so the logo
+                    // visibly jumped as one replaced the other.
+                    .ignoresSafeArea()
                     .transition(.opacity)
                 }
             }
             .task {
+                // Dapp requests can arrive at any time, so the relay starts with
+                // the app rather than when the connections screen is opened.
+                walletConnect.start()
                 try? await Task.sleep(for: .seconds(1))
                 withAnimation(.easeOut(duration: 0.35)) { showSplash = false }
+            }
+            .onOpenURL { url in
+                Task { await walletConnect.pair(url.absoluteString) }
+            }
+            // Presented from the root so a dapp reaches the user on any screen.
+            .sheet(isPresented: .init(get: { walletConnect.proposal != nil },
+                                      set: { if !$0 { walletConnect.proposal = nil } })) {
+                if let proposal = walletConnect.proposal {
+                    ConnectionRequestSheet(proposal: proposal)
+                }
+            }
+            .sheet(isPresented: .init(get: { walletConnect.request != nil },
+                                      set: { if !$0 { walletConnect.request = nil } })) {
+                if let request = walletConnect.request {
+                    SignatureRequestSheet(request: request)
+                }
             }
             .alert("This device looks jailbroken", isPresented: $showIntegrityWarning) {
                 Button("I understand", role: .cancel) {}

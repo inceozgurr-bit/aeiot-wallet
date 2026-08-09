@@ -83,8 +83,13 @@ struct OnboardingView: View {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 12) {
                 ForEach(Array(words.enumerated()), id: \.offset) { index, word in
                     HStack(spacing: 4) {
-                        Text("\(index + 1).").foregroundStyle(.tertiary).font(.caption)
-                        Text(word).font(.callout.monospaced())
+                        // Fixed width and fixed-width digits, so "1." and "12."
+                        // start their word at the same place in every column.
+                        Text("\(index + 1).")
+                            .foregroundStyle(.tertiary)
+                            .font(.caption.monospacedDigit())
+                            .frame(width: 22, alignment: .trailing)
+                        Text(word).font(.callout.monospaced()).oneLine(0.6)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(8)
@@ -113,7 +118,10 @@ struct OnboardingView: View {
                         Text("\(index + 1).")
                             .font(.callout.monospaced())
                             .foregroundStyle(.secondary)
-                            .frame(width: 28, alignment: .trailing)
+                            // 28pt was a hair too narrow for a two-digit number
+                            // at this size, which pushed the field out of line.
+                            .frame(width: 36, alignment: .trailing)
+                            .oneLine()
                         TextField("word", text: Binding(
                             get: { quizAnswers[index] ?? "" },
                             set: { quizAnswers[index] = $0 }

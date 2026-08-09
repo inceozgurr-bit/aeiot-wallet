@@ -28,6 +28,20 @@ her rapor sade Türkçe, teknik jargon açıklanarak verilir.
 | iOS proje üret | `cd ios && xcodegen generate` |
 | iOS build | `cd ios && xcodebuild -project AEIOTWallet.xcodeproj -scheme AEIOTWallet -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` |
 
+## App Store Connect kaydı
+
+| Alan | Değer |
+|---|---|
+| App adı | AEIOT (alt başlık boş, 30 karakter hakkı duruyor) |
+| Bundle ID | `aeiot.app001` — App Store Connect'te kayıtlı, **sonradan değiştirilemez**; `project.yml` bununla birebir aynı olmalı yoksa yükleme reddedilir |
+| SKU | `aeiot.app002` (yalnız Apple tarafında, kodda karşılığı yok) |
+| Apple ID (app) | 6799625313 |
+| Team ID | JMLSCK7G9U |
+| Sürüm | `MARKETING_VERSION` 1.0 / `CURRENT_PROJECT_VERSION` 1 |
+
+- **Bundle ID ≠ Keychain service:** `Keychain.service` bilerek `com.aeiot.wallet` kaldı. O string değişirse kayıtlı kurtarma cümleleri erişilemez olur — bundle ID'ye uydurmak için **dokunma**.
+- Bundle ID `com.aeiot.wallet`'tan `aeiot.app001`'e geçtiği için, eski kimlikle kurulu cihazlardaki cüzdanlar Keychain erişim grubu değiştiğinden okunamaz; kurtarma cümlesiyle yeniden içe aktarılmaları gerekir.
+
 ## iOS mimari notları
 
 - **Bağımlılık:** yalnız `web3swift` (BIP39 + imzalama + ERC-20 ABI). EVM dışı zincirler (Solana/XRP/Bitcoin) için yeni bağımlılık gerekir — onay al.
@@ -47,10 +61,24 @@ her rapor sade Türkçe, teknik jargon açıklanarak verilir.
 - **Ayarlar** (`SettingsView`, toolbar sol üstteki dişli — eski "i" butonunun yeri): tema, dil, Face ID ile açma, AEIOT Hakkında, Kullanım Koşulları + Gizlilik Politikası (`LegalView`), sürüm.
 - **Tema:** Açık/Koyu/Sistem (`ThemeMode`, `@AppStorage("themeMode")`, varsayılan **açık**). `preferredColorScheme` sheet'lere geçmediği için `UIWindow.overrideUserInterfaceStyle` kullanılıyor — tema kodu buradan değişir.
 - **Tek vurgu rengi:** marka kırmızısı (`Color.appAccent`, logodan örneklendi; açık temada kontrast için biraz koyu), kökte `.tint`. Yeşil/turuncu/mavi yok; yön bilgisi ok ikonu + işaretle verilir, düşüş/giden `.secondary`.
-- **Diller:** `Localizable.xcstrings` (kaynak `en` + `tr`) + izin metinleri için `en.lproj`/`tr.lproj/InfoPlist.strings`. Ayarlar'dan Türkçe/English seçilir (`AppLanguage`); ilk açılışta `deviceDefault` (cihaz Türkçe ise TR, diğer her dilde EN). `Localization` `Bundle.main`'i seçilen `.lproj`'a yönlendirir, kök view `.id(appLanguage)` ile yenilenir.
+- **Diller:** `Localizable.xcstrings` (kaynak `en`, 184 anahtar) + her dil için izin metinleri `<kod>.lproj/InfoPlist.strings`. `AppLanguage` **18 dil** tanımlar (en tr es de fr it pt nl ru uk ar hi id th vi zh-Hans ja ko) ama Ayarlar yalnız `AppLanguage.available` gösterir — bundle'da `.lproj`'u olan diller. **18 dilin hepsi hazır ve derleniyor** (her biri 184 anahtar; `tr` 6 sembol anahtarını İngilizce'den devralır). Ayarlar'daki liste **tr → en → uk** ile başlar (`available` içinde sabitlenmiş), kalanlar kendi adlarına göre sıralanır; popover 10 satır yüksekliğinde açılıp gerisini kaydırır. İlk açılışta `deviceDefault` cihaz diline en yakın *hazır* dili seçer; sonrası Ayarlar'daki seçim. `Localization` `Bundle.main`'i seçilen `.lproj`'a yönlendirir, kök view `.id(appLanguage)` ile yenilenir.
+- **Dil eklerken:** (1) `Localizable.xcstrings`'e 184 anahtarın çevirisi, (2) `<kod>.lproj/InfoPlist.strings`, (3) `xcodegen generate` — `knownRegions`'a otomatik girer, (4) derlenen `.app` içinde `<kod>.lproj/Localizable.strings` var mı doğrula. `.lproj` yoksa dil sessizce İngilizce'ye düşer. Arapça geldiğinde RTL hazır: `AppLanguage.layoutDirection` → kökte `.environment(\.layoutDirection,…)`; iOS kendi çevirmez, çünkü uygulama içi dil seçimi cihaz dilini eziyor.
+- **Uzun çeviri = bozulan düzen:** dar/sabit alandaki metne (buton, rozet, satır sonu değeri) **`.oneLine()`** ekle (`Theme.swift`; `lineLimit(1)` + `minimumScaleFactor`). Almanca "Empfangen" ana ekran butonlarını iki satıra kırıp buton yüksekliğini bozmuştu. Çok satırlı açıklama/legal metinlere **ekleme**.
 - **Lokalizasyon tuzakları:** `String(localized:)` bundle yönlendirmesini atlar — bunun yerine **`String.loc(...)`** kullan. Ternary içinde `Text(kosul ? "A" : "B")` yazma (çeviriye uğramaz), `LocalizedStringKey` değişkeni kullan.
 - Face ID anahtarı yalnız **açılış kilidini** kapatır; para gönderme ve kurtarma cümlesi her koşulda biyometri ister.
 - Fiyatlar CoinGecko free API; AEIOT'un fiyatı havuz açılana dek "No market yet".
+
+## WalletConnect
+
+Cüzdanı dapp'lere bağlar. `WalletConnectService.swift` (SDK köprüsü + imzalama) ve `Views/WalletConnectViews.swift` (bağlantı isteği, imza isteği, bağlı uygulamalar).
+
+- **Paket:** `reown-com/reown-swift`, ürün **`ReownWalletKit`** (WalletConnect'in yeni adı Reown), `exactVersion: 2.3.1` ile **sabitlenmiş** — ileride sessizce çakışan bir bağımlılık gelmesin diye; sürümü bilerek yükselt.
+- **web3swift ile çakışmıyor** (gerçek build ile doğrulandı): reown `secp256k1.swift`/`CryptoSwift` çekmiyor. Solana kütüphanelerindeki sorun burada yok.
+- **Yapılandırma:** Project ID `ios/Secrets.xcconfig` içinde (`REOWN_PROJECT_ID`, git'te değil — `.gitignore` `*.xcconfig`), `project.yml` bunu Info.plist'e `ReownProjectID` olarak geçirir. Yeni makinede bu dosyayı `cloud.reown.com` → proje "AEIOT" değerinden yeniden oluştur, yoksa eşleştirme çalışmaz.
+- **App Group `group.aeiot.app001` zorunlu:** SDK kendi Keychain kayıtlarını bu erişim grubuna yazıyor ve eksikse yedek yolu yok. `project.yml`'daki `entitlements` bunu üretiyor; Apple tarafına `xcodebuild -allowProvisioningUpdates` ile otomatik kaydedildi (portal'da elle iş gerekmedi).
+- **Kendi parçalarımız, yeni bağımlılık yok:** Reown röle soketi getirmiyor (örnek uygulaması Starscream kullanıyor) → `URLSessionWebSocketTask` ile yazıldı. `CryptoProvider` için keccak (CryptoSwift) + `SECP256K1.recoverPublicKey` (web3swift) yeterli. **Not:** `toHexString()` hem CryptoSwift hem web3swift'te var, doğrudan çağırmak "ambiguous" hatası verir.
+- **Desteklenenler:** `personal_sign`, `eth_signTypedData(_v4)`. EIP-712 için elle kodlama gerekmedi — web3swift'te `EIP712Parser.parse` + `Web3Signer.signEIP712` hazır. **Kasten reddedilenler:** `eth_sign` (kullanıcıya bağlam göstermeden opak hash imzalar), `wallet_addEthereumChain` (dapp'ten RPC adresi kabul etmek). `eth_sendTransaction` **henüz yok** — sıradaki iş.
+- **Güvenlik kuralı:** her imza `WalletStore.loadKeystore()` üzerinden **taze Face ID** ister; onaylı oturum imza yetkisi değildir. "Bu dapp için bir daha sorma" muafiyeti **asla** eklenmemeli.
 
 ## Faz durumu
 

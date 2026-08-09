@@ -6,6 +6,8 @@ struct WalletManageView: View {
 
     @State private var toDelete: WalletInfo?
     @State private var toExport: WalletInfo?
+    @State private var toRename: WalletInfo?
+    @State private var renameText = ""
 
     var body: some View {
         NavigationStack {
@@ -13,12 +15,20 @@ struct WalletManageView: View {
                 ForEach(wallet.wallets) { info in
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(info.name).font(.headline)
+                            Text(info.name).font(.headline).oneLine()
                             Text(shortAddress(info.address))
                                 .font(.caption.monospaced())
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
+                        Button {
+                            Haptic.tap()
+                            renameText = info.name
+                            toRename = info
+                        } label: {
+                            Image(systemName: "pencil")
+                        }
+                        .buttonStyle(.borderless)
                         Button {
                             Haptic.tap()
                             toExport = info
@@ -53,6 +63,15 @@ struct WalletManageView: View {
                 Button("Cancel", role: .cancel) { toDelete = nil }
             } message: {
                 Text("This removes the wallet from this device. You can only restore it with its 12-word recovery phrase.")
+            }
+            .alert("Rename Wallet", isPresented: .init(
+                get: { toRename != nil }, set: { if !$0 { toRename = nil } })) {
+                TextField("Name", text: $renameText)
+                Button("Save") {
+                    if let toRename { wallet.rename(toRename, to: renameText) }
+                    toRename = nil
+                }
+                Button("Cancel", role: .cancel) { toRename = nil }
             }
             .sheet(item: $toExport) { WalletExportView(wallet: $0) }
         }
@@ -111,12 +130,12 @@ struct WalletExportView: View {
                         copied = true
                     } label: {
                         Label(copyKey, systemImage: copied ? "checkmark" : "doc.on.doc")
-                            .font(.subheadline)
+                            .font(.subheadline).oneLine()
                     }
                     if let pdf = pdfURL(phrase: phrase) {
                         ShareLink(item: pdf) {
                             Label("Export PDF", systemImage: "square.and.arrow.up")
-                                .font(.subheadline)
+                                .font(.subheadline).oneLine()
                         }
                     }
                 }

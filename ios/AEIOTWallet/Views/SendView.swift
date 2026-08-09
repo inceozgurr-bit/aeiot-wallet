@@ -264,7 +264,7 @@ struct SendView: View {
 
     private func confirmRow(_ label: LocalizedStringKey, _ value: String) -> some View {
         HStack {
-            Text(label).foregroundStyle(.secondary)
+            Text(label).foregroundStyle(.secondary).oneLine()
             Spacer()
             Text(value).fontWeight(.semibold)
         }

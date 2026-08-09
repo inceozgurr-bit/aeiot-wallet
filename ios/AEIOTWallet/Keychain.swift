@@ -3,6 +3,9 @@ import Security
 import LocalAuthentication
 
 enum Keychain {
+    /// Namespace for this app's items, deliberately independent of the bundle
+    /// identifier: changing this string orphans every stored seed phrase, so it
+    /// stays put even when the bundle ID changes.
     private static let service = "com.aeiot.wallet"
 
     /// Saves a value. When `requireBiometry` is true the item can only be read

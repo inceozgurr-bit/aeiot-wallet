@@ -52,6 +52,14 @@ extension View {
     func glassCard() -> some View {
         padding(20).glassEffect(.regular, in: .rect(cornerRadius: 24))
     }
+
+    /// For text in a fixed-width slot — buttons, badges, a row's trailing value.
+    /// Languages with long words (German "Empfangen", Ukrainian "Отримати")
+    /// would otherwise wrap and push the surrounding layout out of shape, so the
+    /// text shrinks to fit instead.
+    func oneLine(_ minimumScale: CGFloat = 0.7) -> some View {
+        lineLimit(1).minimumScaleFactor(minimumScale)
+    }
 }
 
 /// Falls back to a lettered disc for coins that have no artwork bundled.

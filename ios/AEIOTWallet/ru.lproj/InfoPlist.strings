@@ -1,0 +1,3 @@
+/* System permission prompts. Keys must match the Info.plist keys. */
+"NSFaceIDUsageDescription" = "Face ID защищает ваш кошелёк и подтверждает транзакции.";
+"NSCameraUsageDescription" = "Камера используется для сканирования QR-кодов получателей.";

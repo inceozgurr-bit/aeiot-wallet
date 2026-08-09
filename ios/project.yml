@@ -1,6 +1,6 @@
 name: AEIOTWallet
 options:
-  bundleIdPrefix: com.aeiot
+  bundleIdPrefix: aeiot
   deploymentTarget:
     iOS: "26.0"
   # English is the base language, so any device that is not Turkish gets English.
@@ -9,11 +9,27 @@ packages:
   web3swift:
     url: https://github.com/web3swift-team/web3swift
     from: 3.3.0
+  reown:
+    url: https://github.com/reown-com/reown-swift
+    # Pinned exactly: a future release could add a transitive dependency that
+    # collides with web3swift's secp256k1/CryptoSwift. Bump deliberately.
+    exactVersion: 2.3.1
 targets:
   AEIOTWallet:
     type: application
     platform: iOS
     sources: [AEIOTWallet]
+    # Holds REOWN_PROJECT_ID. Not in git; see CLAUDE.md to recreate.
+    configFiles:
+      Debug: Secrets.xcconfig
+      Release: Secrets.xcconfig
+    entitlements:
+      path: AEIOTWallet/AEIOTWallet.entitlements
+      properties:
+        # Reown's SDK writes its own keychain items into this access group and
+        # has no fallback if it is missing.
+        com.apple.security.application-groups:
+          - group.aeiot.app001
     info:
       path: AEIOTWallet/Info.plist
       properties:
@@ -21,11 +37,26 @@ targets:
         UILaunchScreen:
           UIColorName: LaunchBackground
           UIImageName: LaunchLogo
+        # Read at launch by WalletConnectService; substituted from Secrets.xcconfig.
+        ReownProjectID: $(REOWN_PROJECT_ID)
+        # Lets a dapp hand control back to this app after a signature.
+        CFBundleURLTypes:
+          - CFBundleURLName: aeiot.app001
+            CFBundleURLSchemes: [aeiot]
     dependencies:
       - package: web3swift
+      - package: reown
+        product: ReownWalletKit
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.aeiot.wallet
+        # Must stay identical to the Bundle ID registered in App Store Connect
+        # (app Apple ID 6799625313) — a mismatch rejects the upload.
+        PRODUCT_BUNDLE_IDENTIFIER: aeiot.app001
+        # Home screen and App Store name; without it the target name
+        # ("AEIOTWallet") shows under the icon.
+        INFOPLIST_KEY_CFBundleDisplayName: AEIOT
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
         DEVELOPMENT_TEAM: JMLSCK7G9U
         CODE_SIGN_STYLE: Automatic
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
