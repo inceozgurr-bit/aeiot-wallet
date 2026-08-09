@@ -313,7 +313,11 @@ struct HomeView: View {
     private func refresh() async {
         guard let address = wallet.address else { return }
         async let fetchedPrices = PriceService.usdPrices(for: Token.all)
-        async let fetchedActivity = HistoryService.recentTransfers(for: address)
+        async let fetchedActivity = HistoryService.recentTransfers(
+            evm: address,
+            bitcoin: wallet.addresses(for: .bitcoin),
+            solana: wallet.address(for: .solana),
+            xrp: wallet.address(for: .xrp))
         // One request per coin across six networks — serial would take seconds.
         balances = await withTaskGroup(of: (String, Decimal)?.self) { group in
             for token in Token.all {
