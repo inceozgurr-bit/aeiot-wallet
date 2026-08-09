@@ -26,14 +26,20 @@ struct Chain: Identifiable, Hashable, Sendable {
     let explorer: String
     /// Blockscout instance for transfer history; nil where no public one exists.
     let blockscout: String?
-    /// Uniswap-V2-compatible router, only where the pools hold real liquidity.
-    /// Measured against spot prices: Arbitrum (SushiV2) and Optimism (UniV2)
-    /// quote 25–88% below market, so swapping stays disabled there.
+    /// Uniswap-V2-compatible router, only where those pools hold real liquidity.
+    /// Measured against spot: on Arbitrum the V2 pool quoted 7.8% under and
+    /// SushiSwap's 25% under, so V2 is not used there — see `v3Router`.
     var swapRouter: String? = nil
+    /// Uniswap V3, for the chains whose V2 pools are too thin to quote honestly.
+    /// Measured on the pair V2 failed: within 0.06% of spot on Arbitrum, 0.25%
+    /// on Optimism.
+    var v3Router: String? = nil
+    var v3Quoter: String? = nil
     /// Wrapped form of the native coin, which every pool pairs against.
     var wrappedNative: String? = nil
 
-    var canSwap: Bool { swapRouter != nil }
+    var canSwap: Bool { swapRouter != nil || v3Router != nil }
+    var usesV3: Bool { v3Router != nil }
 
     static let base = Chain(
         id: "base", name: "Base", kind: .evm(chainID: 8453), nativeSymbol: "ETH",
@@ -55,14 +61,20 @@ struct Chain: Identifiable, Hashable, Sendable {
         id: "arbitrum", name: "Arbitrum", kind: .evm(chainID: 42161), nativeSymbol: "ETH",
         rpc: URL(string: "https://arb1.arbitrum.io/rpc")!,
         explorer: "https://arbiscan.io",
-        blockscout: "https://arbitrum.blockscout.com")
+        blockscout: "https://arbitrum.blockscout.com",
+        v3Router: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+        v3Quoter: "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+        wrappedNative: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1")
 
     static let optimism = Chain(
         id: "optimism", name: "Optimism", kind: .evm(chainID: 10), nativeSymbol: "ETH",
         rpc: URL(string: "https://mainnet.optimism.io")!,
         explorer: "https://optimistic.etherscan.io",
         // optimism.blockscout.com redirects here; skip the extra round trip.
-        blockscout: "https://explorer.optimism.io")
+        blockscout: "https://explorer.optimism.io",
+        v3Router: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+        v3Quoter: "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+        wrappedNative: "0x4200000000000000000000000000000000000006")
 
     static let polygon = Chain(
         id: "polygon", name: "Polygon", kind: .evm(chainID: 137), nativeSymbol: "POL",

@@ -152,6 +152,105 @@ actor ChainService {
     /// price movement between quote and mining is real.
     private static let slippageNumerator = 85
 
+    /// Swaps through Uniswap V3. Three shapes, because the router only speaks
+    /// in wrapped coin: paying with the native coin sends it as `value`, and
+    /// receiving it needs a second call to unwrap, bundled so either both steps
+    /// happen or neither does.
+    private func v3Swap(from: Token, to: Token, amountIn: BigUInt, minOut: BigUInt,
+                        keystore: BIP32Keystore, owner: EthereumAddress, nonce: BigUInt,
+                        gasPrice: BigUInt, on chain: Chain) async throws -> String {
+        guard let routerAddress = chain.v3Router, let router = EthereumAddress(routerAddress),
+              let wrapped = chain.wrappedNative else { throw WalletError.invalidAddress }
+        let tokenIn = from.contract ?? wrapped
+        let tokenOut = to.contract ?? wrapped
+        let fee = try await v3Fee(tokenIn: tokenIn, tokenOut: tokenOut, amountIn: amountIn, on: chain)
+        var nonce = nonce
+
+        // Paying with a token means letting the router move it first.
+        if let contract = from.contract, let tokenAddress = EthereumAddress(contract) {
+            let web3 = try await connection(chain)
+            guard let erc20 = web3.contract(Web3.Utils.erc20ABI, at: tokenAddress),
+                  let approveData = erc20.createWriteOperation("approve", parameters: [router, amountIn])?
+                      .transaction.data else { throw WalletError.invalidAddress }
+            let approveHash = try await signAndSend(to: tokenAddress, data: approveData, value: 0,
+                                                    nonce: nonce, gasPrice: gasPrice,
+                                                    keystore: keystore, from: owner, on: chain)
+            guard try await waitForConfirmation(hash: approveHash, on: chain) else {
+                throw WalletError.approvalFailed
+            }
+            nonce += 1
+        }
+
+        let wantsNativeOut = to.contract == nil
+        let swapCall = UniswapV3.exactInputSingle(
+            tokenIn: tokenIn, tokenOut: tokenOut, fee: fee,
+            // Receiving native coin: the router keeps the WETH so it can unwrap.
+            recipient: wantsNativeOut ? UniswapV3.routerAsRecipient : owner.address,
+            amountIn: amountIn, amountOutMinimum: minOut)
+        let data = wantsNativeOut
+            ? UniswapV3.multicall([swapCall,
+                                   UniswapV3.unwrapWETH9(amountMinimum: minOut,
+                                                         recipient: owner.address)])
+            : swapCall
+        return try await signAndSend(to: router, data: data,
+                                     value: from.contract == nil ? amountIn : 0,
+                                     nonce: nonce, gasPrice: gasPrice,
+                                     keystore: keystore, from: owner, on: chain)
+    }
+
+    /// Which fee tier actually holds this pair, decided by asking both.
+    private func v3Fee(tokenIn: String, tokenOut: String,
+                       amountIn: BigUInt, on chain: Chain) async throws -> BigUInt {
+        guard let quoter = chain.v3Quoter else { throw WalletError.invalidAddress }
+        for fee in [UniswapV3.lowFee, UniswapV3.mediumFee] {
+            let data = UniswapV3.quoteExactInputSingle(tokenIn: tokenIn, tokenOut: tokenOut,
+                                                       amountIn: amountIn, fee: fee)
+            if let out = try? await ethCall(to: quoter, data: data, on: chain), out > 0 { return fee }
+        }
+        throw WalletError.invalidAmount
+    }
+
+    /// Asks a Uniswap V3 pool what comes out, trying the deep 0.05% tier first
+    /// and falling back to 0.30% for pairs that only exist there.
+    private func v3AmountOut(from: Token, to: Token, amountIn: BigUInt) async throws -> BigUInt {
+        let chain = from.chain
+        guard let quoter = chain.v3Quoter, let wrapped = chain.wrappedNative else {
+            throw WalletError.invalidAddress
+        }
+        // A native coin is quoted as its wrapped form; the pools only hold that.
+        let tokenIn = from.contract ?? wrapped
+        let tokenOut = to.contract ?? wrapped
+        for fee in [UniswapV3.lowFee, UniswapV3.mediumFee] {
+            let data = UniswapV3.quoteExactInputSingle(tokenIn: tokenIn, tokenOut: tokenOut,
+                                                       amountIn: amountIn, fee: fee)
+            if let out = try? await ethCall(to: quoter, data: data, on: chain), out > 0 {
+                return out
+            }
+        }
+        throw WalletError.invalidAmount
+    }
+
+    /// A raw `eth_call` returning the first 32-byte word. The quoter takes a
+    /// tuple, which web3swift's ABI encoder will not build, so the call data is
+    /// assembled by hand in `UniswapV3`.
+    private func ethCall(to address: String, data: Data, on chain: Chain) async throws -> BigUInt {
+        var request = URLRequest(url: chain.rpc)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let hex = "0x" + data.map { String(format: "%02x", $0) }.joined()
+        request.httpBody = try? JSONSerialization.data(withJSONObject: [
+            "jsonrpc": "2.0", "id": 1, "method": "eth_call",
+            "params": [["to": address, "data": hex], "latest"],
+        ])
+        let (body, _) = try await URLSession.shared.data(for: request)
+        guard let root = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
+              let result = root["result"] as? String, result.count >= 66,
+              let value = BigUInt(String(result.dropFirst(2).prefix(64)), radix: 16) else {
+            throw WalletError.invalidAmount
+        }
+        return value
+    }
+
     /// The pool's own answer, in the token's smallest unit. Kept as BigUInt so
     /// the slippage floor never has to survive a trip through a formatted
     /// string: that rounding could fail and silently leave no floor at all.
@@ -163,6 +262,7 @@ actor ChainService {
         guard let value = Utilities.parseToBigUInt(amount, decimals: from.decimals), value > 0 else {
             throw WalletError.invalidAmount
         }
+        if from.chain.usesV3 { return try await v3AmountOut(from: from, to: to, amountIn: value) }
         let path = swapPath(from: from, to: to, wrapped: venue.wrapped)
         guard let contract = web3.contract(routerABI, at: venue.router),
               let op = contract.createReadOperation("getAmountsOut", parameters: [value, path]) else {
@@ -217,6 +317,11 @@ actor ChainService {
         guard minOut > 0 else { throw WalletError.invalidAmount }
         var nonce = try await web3.eth.getTransactionCount(for: owner, onBlock: .pending)
         let gasPrice = ((try? await web3.eth.gasPrice()) ?? BigUInt(100_000_000)) * 2
+        if chain.usesV3 {
+            return try await v3Swap(from: from, to: to, amountIn: value, minOut: minOut,
+                                    keystore: keystore, owner: owner, nonce: nonce,
+                                    gasPrice: gasPrice, on: chain)
+        }
         // A swap that cannot be mined soon should expire, not sit in the mempool
         // waiting for a moment when it is profitable to somebody else.
         let deadline = BigUInt(Date().timeIntervalSince1970 + 20 * 60)
