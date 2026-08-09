@@ -303,7 +303,7 @@ final class WalletConnectService {
 
     /// Bidirectional overrides and zero-width characters can make a payload read
     /// as something other than what gets signed.
-    private static func sanitized(_ text: String) -> String {
+    static func sanitized(_ text: String) -> String {
         let hostile = Set<Character>("\u{202A}\u{202B}\u{202C}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{2069}\u{200B}\u{200C}\u{200D}\u{FEFF}")
         return String(text.map { hostile.contains($0) ? "\u{FFFD}" : $0 })
     }

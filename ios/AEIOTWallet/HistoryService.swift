@@ -220,18 +220,11 @@ enum HistoryService {
             return []
         }
         let owner = address.lowercased()
-        // Blockscout stamps transfers with microseconds ("…T20:46:59.000000Z"),
-        // which the plain internet-date parser rejects — every row then fell back
-        // to "now", so the list showed one identical timestamp in random order.
-        let fractional = ISO8601DateFormatter()
-        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let plain = ISO8601DateFormatter()
         return root.items.prefix(25).compactMap { item -> Activity? in
             guard let decimalsString = item.token.decimals, let decimals = Int(decimalsString),
                   let rawValue = item.total.value, let raw = Decimal(string: rawValue),
                   // Showing a wrong date on a transfer is worse than omitting it.
-                  let date = fractional.date(from: item.timestamp)
-                      ?? plain.date(from: item.timestamp) else { return nil }
+                  let date = parseTimestamp(item.timestamp) else { return nil }
             let amount = raw / pow(10, decimals)
             return Activity(
                 chain: chain,
@@ -248,7 +241,18 @@ enum HistoryService {
     /// a coin whose "symbol" is a phishing line, a lookalike of a real ticker
     /// written in another alphabet, or text that reorders the row around it.
     /// Tickers are short and alphanumeric; anything else is not one.
-    private static func safeSymbol(_ raw: String?) -> String {
+    /// Blockscout stamps transfers with microseconds ("…T20:46:59.000000Z"),
+    /// which the plain internet-date parser rejects. When that happened every
+    /// row fell back to "now", so the whole list showed one identical timestamp
+    /// in random order. Both shapes are accepted; anything else is refused
+    /// rather than guessed.
+    static func parseTimestamp(_ text: String) -> Date? {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return fractional.date(from: text) ?? ISO8601DateFormatter().date(from: text)
+    }
+
+    static func safeSymbol(_ raw: String?) -> String {
         let cleaned = (raw ?? "").unicodeScalars.filter {
             CharacterSet.alphanumerics.contains($0) && $0.isASCII
         }

@@ -15,6 +15,20 @@ packages:
     # collides with web3swift's secp256k1/CryptoSwift. Bump deliberately.
     exactVersion: 2.3.1
 targets:
+  # Guards the hand-written crypto: address derivation and transaction signing
+  # for Bitcoin, Solana and XRP have no library behind them, and a regression
+  # there sends money somewhere nobody can reach it.
+  AEIOTWalletTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [AEIOTWalletTests]
+    dependencies:
+      - target: AEIOTWallet
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.10"
+
   AEIOTWallet:
     type: application
     platform: iOS
