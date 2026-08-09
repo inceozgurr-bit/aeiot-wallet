@@ -10,6 +10,10 @@ struct OnboardingView: View {
     @State private var errorMessage: String?
     @State private var isWorking = false
     @State private var screenGuard = ScreenGuard()
+    /// Which words we ask back, and what the user answered.
+    @State private var quizIndices: [Int] = []
+    @State private var quizAnswers: [Int: String] = [:]
+    @State private var quizFailed = false
 
     var body: some View {
         ZStack {

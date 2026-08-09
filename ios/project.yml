@@ -14,6 +14,13 @@ targets:
     type: application
     platform: iOS
     sources: [AEIOTWallet]
+    info:
+      path: AEIOTWallet/Info.plist
+      properties:
+        # Black background with the mark centred — Apple's own key names.
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+          UIImageName: LaunchLogo
     dependencies:
       - package: web3swift
     settings:
@@ -25,9 +32,6 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDevelopmentRegion: en
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        # Black launch screen with just the mark, centred.
-        INFOPLIST_KEY_UILaunchScreen_BackgroundColor: LaunchBackground
-        INFOPLIST_KEY_UILaunchScreen_ImageName: LaunchLogo
         INFOPLIST_KEY_NSFaceIDUsageDescription: Face ID protects your wallet and confirms transactions.
         INFOPLIST_KEY_NSCameraUsageDescription: The camera is used to scan recipient QR codes.
         TARGETED_DEVICE_FAMILY: "1"
