@@ -66,17 +66,19 @@ struct AEIOTWalletApp: App {
             .onOpenURL { url in
                 Task { await walletConnect.pair(url.absoluteString) }
             }
-            // Presented from the root so a dapp reaches the user on any screen.
-            .sheet(isPresented: .init(get: { walletConnect.proposal != nil },
+            // Presented from the root so a dapp reaches the user on any screen —
+            // but never over the lock screen, where approving a connection would
+            // expose the address and open a lasting session with no check at all.
+            .sheet(isPresented: .init(get: { walletConnect.proposal != nil && !wallet.isLocked },
                                       set: { if !$0 { walletConnect.proposal = nil } })) {
                 if let proposal = walletConnect.proposal {
-                    ConnectionRequestSheet(proposal: proposal)
+                    ConnectionRequestSheet(pending: proposal)
                 }
             }
-            .sheet(isPresented: .init(get: { walletConnect.request != nil },
+            .sheet(isPresented: .init(get: { walletConnect.request != nil && !wallet.isLocked },
                                       set: { if !$0 { walletConnect.request = nil } })) {
                 if let request = walletConnect.request {
-                    SignatureRequestSheet(request: request)
+                    SignatureRequestSheet(pending: request)
                 }
             }
             .alert("This device looks jailbroken", isPresented: $showIntegrityWarning) {

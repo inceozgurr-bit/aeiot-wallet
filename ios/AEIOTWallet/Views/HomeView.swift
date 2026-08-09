@@ -41,7 +41,10 @@ struct HomeView: View {
                     }
                     .padding(20)
                 }
-                .refreshable { refreshTrigger += 1 }
+                // Awaited, so the spinner stays until the data is actually in.
+                // Bumping a trigger and returning made it vanish immediately,
+                // which reads as "nothing happened" and invites another pull.
+                .refreshable { await refresh() }
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -261,8 +264,12 @@ struct HomeView: View {
         (try? JSONDecoder().decode(Set<String>.self, from: hiddenData)) ?? []
     }
 
+    /// Decoded once per pass, not once per row: this call used to sit inside the
+    /// filter closure, so a long history re-decoded the hidden set for every
+    /// transaction, on every redraw.
     private var visibleActivity: [Activity] {
-        activity.filter { !hiddenIDs.contains($0.id) }
+        let hidden = hiddenIDs
+        return activity.filter { !hidden.contains($0.id) }
     }
 
     private func hideActivity(_ id: String) {
@@ -274,7 +281,9 @@ struct HomeView: View {
     @ViewBuilder
     private var activitySection: some View {
         if !visibleActivity.isEmpty {
-            VStack(alignment: .leading, spacing: 12) {
+            // Lazy, because each row carries its own scroll view and glass
+            // layer: "Show More" otherwise keeps every one of them alive.
+            LazyVStack(alignment: .leading, spacing: 12) {
                 Text("Activity")
                     .font(.headline)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -308,7 +317,7 @@ struct HomeView: View {
             solana: wallet.address(for: .solana),
             xrp: wallet.address(for: .xrp))
         // One request per coin across six networks — serial would take seconds.
-        balances = await withTaskGroup(of: (String, Decimal)?.self) { group in
+        await withTaskGroup(of: (String, Decimal)?.self) { group in
             for token in Token.all {
                 // Each network has its own address; Bitcoin has a whole set of them.
                 let owners = wallet.addresses(for: token.chain)
@@ -319,17 +328,22 @@ struct HomeView: View {
                     return (token.id, balance)
                 }
             }
-            var result: [String: Decimal] = [:]
+            // Written as they arrive: waiting for all of them meant one slow
+            // public node held every row at "···" until it timed out.
             for await pair in group {
-                if let pair { result[pair.0] = pair.1 }
+                guard !Task.isCancelled else { return }
+                if let pair { balances[pair.0] = pair.1 }
             }
-            return result
         }
+        // Switching wallets cancels this pass; without the check its now-stale
+        // results would overwrite the new wallet's.
+        guard !Task.isCancelled else { return }
         var newPrices = await fetchedPrices
         if let ethUSD = newPrices["ethereum"],
            let aeiotUSD = await PriceService.aeiotUSDPrice(ethUSD: ethUSD) {
             newPrices["aeiot"] = aeiotUSD
         }
+        guard !Task.isCancelled else { return }
         prices = newPrices
         activity = await fetchedActivity
     }

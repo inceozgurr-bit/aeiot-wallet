@@ -80,10 +80,24 @@ Cüzdanı dapp'lere bağlar. `WalletConnectService.swift` (SDK köprüsü + imza
 - **Desteklenenler:** `personal_sign`, `eth_signTypedData(_v4)`. EIP-712 için elle kodlama gerekmedi — web3swift'te `EIP712Parser.parse` + `Web3Signer.signEIP712` hazır. **Kasten reddedilenler:** `eth_sign` (kullanıcıya bağlam göstermeden opak hash imzalar), `wallet_addEthereumChain` (dapp'ten RPC adresi kabul etmek). `eth_sendTransaction` **henüz yok** — sıradaki iş.
 - **Güvenlik kuralı:** her imza `WalletStore.loadKeystore()` üzerinden **taze Face ID** ister; onaylı oturum imza yetkisi değildir. "Bu dapp için bir daha sorma" muafiyeti **asla** eklenmemeli.
 
+## Güvenlik kararları (denetim sonrası — bozma)
+
+- **Kurtarma cümlesi `.biometryCurrentSet` ile korunuyor** (`Keychain.swift`), `.userPresence` değil: cihaz parolası kabul edilmiyor. Bedeli bilinçli — Face ID yeniden kaydedilirse öğe geçersiz olur ve cüzdan 12 kelimeyle geri yüklenir. **Yalnız bu değişiklikten sonra yazılan cüzdanlar korunuyor**; eski kayıtlar eski ACL'de kalır.
+- **Takas alt sınırı (`minOut`) asla metinden geçmez** (`ChainService.swap`): zincirin ham `BigUInt` cevabı × 85 / 100, üstelik imzalama anında yeniden sorulur. Eski `Decimal → String → parse` yolu ondalık taşmasında ve Arapça rakamlarda `nil` dönüp `?? 0` ile korumayı **tamamen kaldırıyordu**. `deadline` = şimdi + 20 dk (eskiden pratikte sonsuzdu). `approve` makbuzu beklenir.
+- **Her imza taze Face ID ister** — `loadKeystore(reason:)`, istem metni işleme göre değişir. Desteklenmeyen yöntem keystore'a **dokunmadan** reddedilir. Oturum, dapp'in listesini değil `supportedMethods`'u ilan eder.
+- **Keychain okumaları `Task.detached` içinde** (`WalletStore.secret`): main actor'da Face ID istemi arayüzü dondurur, 20+ sn'de iOS uygulamayı öldürür.
+- **Dış kaynaklı metin doğrudan render edilmez** — token sembolleri ASCII alfanümerik + 12 karaktere kırpılır (`HistoryService.safeSymbol`); imza yükünde bidi/zero-width karakterler temizlenir (`WalletConnectService.sanitized`). SDK'nın `VerifyContext`'i (`.scam`/doğrulanamadı) onay ekranlarında gösterilir.
+- **Kurtarma cümlesi diske yalnız istendiğinde iner**: PDF `ShareLink` yerine buton eylemiyle üretilir, `.completeFileProtection` ile yazılır, paylaşım kapanınca silinir. Pano kopyası `localOnly` (yoksa Handoff ile bağlı Mac'lere yayılır).
+- **Bitcoin ücret oranı `maxFeeRate` (300 sat/vB) ile sınırlı**; gönderim onayında ücret satırı var.
+
+## App Store dosyaları
+
+`docs/` GitHub Pages ile yayınlanır (Settings → Pages → `main` / `/docs`): `privacy.html` (App Store Connect'in **zorunlu** politika adresi), `index.html` (destek adresi), `app-store-listing.md` (alt başlık, açıklama, anahtar kelimeler, App Review notu). `PrivacyInfo.xcprivacy` **olmadan yükleme reddedilir** (ITMS-91053) — `UserDefaults` için `CA92.1` beyanı içerir. Gizlilik metni uygulama içi `LegalView` ile birebir aynı kalmalı.
+
 ## Faz durumu
 
 - [x] Faz 1a: kontrat yazıldı, 6/6 test geçti
-- [ ] Faz 1b: deployer'a ~$10 ETH (Base) — **Özgür'ün aksiyonu**
-- [ ] Faz 1c: deploy + Basescan verify
+- [x] Faz 1b: deployer'a ETH yüklendi
+- [x] Faz 1c: deploy + Basescan verify — zincirde doğrulandı (`eth_getCode` dolu, `totalSupply` = 1.150.115)
 - [x] Faz 2: cüzdan app — çoklu cüzdan + Face ID kilit (açılış+arka plan) + sistem teması + TR/EN otomatik (cihaz dili). Cüzdan listesi/seed'ler + adres defteri Keychain'de (app silinse kalıcı). Pencereler: Send/AddWallet tam ekran push (kenardan kayan), Receive/Import alttan sheet. Ekstra özellikler: bakiye gizle/göster, işlem geçmişi (Blockscout API, deploy sonrası dolar), adres defteri, AEIOT tanıtım kartı (toolbar sol üstteki info butonu → sheet), coin sparkles animasyonu. Hepsi simulator'da doğrulandı.
 - [x] Faz 3: Uniswap v2 havuzu açıldı ($10 = 100k AEIOT + 0.0055 ETH). Swap sekmesi canlı — tüm çiftler (AEIOT/ETH/USDC/USDT/cbBTC) token-token dahil, WETH üzerinden çok-adımlı rota (`swapPath`: [A,WETH,B]). USDT (6 decimals) cüzdana + takasa eklendi, simulator'da 1000 AEIOT→0.167 USDT quote zincirle birebir doğrulandı.

@@ -3,7 +3,7 @@ import LocalAuthentication
 import Web3Core
 
 enum WalletError: LocalizedError {
-    case invalidMnemonic, invalidAddress, invalidAmount, keystoreUnavailable
+    case invalidMnemonic, invalidAddress, invalidAmount, keystoreUnavailable, approvalFailed
 
     var errorDescription: String? {
         switch self {
@@ -11,6 +11,7 @@ enum WalletError: LocalizedError {
         case .invalidAddress: String.loc("Invalid address. It should start with 0x.")
         case .invalidAmount: String.loc("Invalid amount.")
         case .keystoreUnavailable: String.loc("Wallet keys could not be loaded.")
+        case .approvalFailed: String.loc("The swap was not approved on the network. Nothing was swapped.")
         }
     }
 }
@@ -91,14 +92,14 @@ final class WalletStore {
             throw WalletError.keystoreUnavailable
         }
         if !wallets.contains(where: { $0.address == addr }) {
-            let seed = BIP39.seedFromMmemonics(mnemonic)
+            let derived = await Self.deriveAddresses(from: mnemonic)
             wallets.append(WalletInfo(
                 name: String.loc("Wallet \(wallets.count + 1)"),
                 address: addr,
-                solanaAddress: seed.flatMap(SolanaKey.keypair(fromSeed:))?.address,
-                xrpAddress: seed.flatMap(XRPKey.keypair(fromSeed:))?.address,
-                bitcoinAddress: seed.flatMap(BitcoinKey.keypair(fromSeed:))?.address,
-                bitcoinAddresses: seed.map(Self.bitcoinAddressSet(seed:))))
+                solanaAddress: derived.solana,
+                xrpAddress: derived.xrp,
+                bitcoinAddress: derived.bitcoin,
+                bitcoinAddresses: derived.bitcoinSet))
         }
         activeAddress = addr
         persist()
@@ -153,20 +154,45 @@ final class WalletStore {
               let index = wallets.firstIndex(where: { $0.id == wallet.id }) else { return false }
         if wallet.solanaAddress != nil && wallet.xrpAddress != nil
             && wallet.bitcoinAddress != nil { return true }
-        guard let mnemonic = Keychain.load(key: "wallet.mnemonic.\(wallet.address)",
-                                           prompt: String.loc("Create your addresses")),
-              let seed = BIP39.seedFromMmemonics(mnemonic) else { return false }
-        wallets[index].solanaAddress = SolanaKey.keypair(fromSeed: seed)?.address
-        wallets[index].xrpAddress = XRPKey.keypair(fromSeed: seed)?.address
-        wallets[index].bitcoinAddress = BitcoinKey.keypair(fromSeed: seed)?.address
-        wallets[index].bitcoinAddresses = Self.bitcoinAddressSet(seed: seed)
+        guard let mnemonic = await Self.secret(for: wallet.address,
+                                               prompt: String.loc("Create your addresses"))
+        else { return false }
+        let derived = await Self.deriveAddresses(from: mnemonic)
+        guard derived.bitcoinSet != nil else { return false }
+        wallets[index].solanaAddress = derived.solana
+        wallets[index].xrpAddress = derived.xrp
+        wallets[index].bitcoinAddress = derived.bitcoin
+        wallets[index].bitcoinAddresses = derived.bitcoinSet
         persist()
         return true
     }
 
 
-    /// Receive and change addresses within the standard gap limit.
-    private static func bitcoinAddressSet(seed: Data) -> [String] {
+    /// The non-EVM addresses a seed produces.
+    struct DerivedAddresses {
+        var solana: String?
+        var xrp: String?
+        var bitcoin: String?
+        var bitcoinSet: [String]?
+    }
+
+    /// Run off the main actor: turning a phrase into a seed is PBKDF2 with 2048
+    /// rounds, and the Bitcoin set alone is forty key derivations. On the main
+    /// actor that visibly locks the screen right after "Create Wallet".
+    private static func deriveAddresses(from mnemonic: String) async -> DerivedAddresses {
+        await Task.detached {
+            guard let seed = BIP39.seedFromMmemonics(mnemonic) else { return DerivedAddresses() }
+            return DerivedAddresses(
+                solana: SolanaKey.keypair(fromSeed: seed)?.address,
+                xrp: XRPKey.keypair(fromSeed: seed)?.address,
+                bitcoin: BitcoinKey.keypair(fromSeed: seed)?.address,
+                bitcoinSet: bitcoinAddressSet(seed: seed))
+        }.value
+    }
+
+    /// Receive and change addresses within the standard gap limit. Not actor
+    /// isolated: it is forty key derivations and belongs off the main thread.
+    private nonisolated static func bitcoinAddressSet(seed: Data) -> [String] {
         (BitcoinKey.keypairs(fromSeed: seed) + BitcoinKey.keypairs(fromSeed: seed, change: true))
             .map(\.address)
     }
@@ -174,8 +200,7 @@ final class WalletStore {
     /// Bitcoin needs every key that might hold coins, plus one for the change.
     func loadBitcoinKeys() async throws -> (keys: [BitcoinKey.Keypair], change: BitcoinKey.Keypair) {
         guard let address = activeAddress,
-              let mnemonic = Keychain.load(key: "wallet.mnemonic.\(address)",
-                                           prompt: String.loc("Authorize this transfer")),
+              let mnemonic = await Self.secret(for: address, prompt: String.loc("Authorize this transfer")),
               let seed = BIP39.seedFromMmemonics(mnemonic),
               let change = BitcoinKey.changeKeypair(fromSeed: seed) else {
             throw WalletError.keystoreUnavailable
@@ -187,8 +212,7 @@ final class WalletStore {
     /// Bitcoin needs both the spending key and the change key.
     func loadBitcoinKeypairs() async throws -> (spend: BitcoinKey.Keypair, change: BitcoinKey.Keypair) {
         guard let address = activeAddress,
-              let mnemonic = Keychain.load(key: "wallet.mnemonic.\(address)",
-                                           prompt: String.loc("Authorize this transfer")),
+              let mnemonic = await Self.secret(for: address, prompt: String.loc("Authorize this transfer")),
               let seed = BIP39.seedFromMmemonics(mnemonic),
               let spend = BitcoinKey.keypair(fromSeed: seed),
               let change = BitcoinKey.changeKeypair(fromSeed: seed) else {
@@ -199,8 +223,7 @@ final class WalletStore {
 
     func loadXRPKeypair() async throws -> XRPKey.Keypair {
         guard let address = activeAddress,
-              let mnemonic = Keychain.load(key: "wallet.mnemonic.\(address)",
-                                           prompt: String.loc("Authorize this transfer")),
+              let mnemonic = await Self.secret(for: address, prompt: String.loc("Authorize this transfer")),
               let seed = BIP39.seedFromMmemonics(mnemonic),
               let keypair = XRPKey.keypair(fromSeed: seed) else {
             throw WalletError.keystoreUnavailable
@@ -210,8 +233,7 @@ final class WalletStore {
 
     func loadSolanaKeypair() async throws -> SolanaKey.Keypair {
         guard let address = activeAddress,
-              let mnemonic = Keychain.load(key: "wallet.mnemonic.\(address)",
-                                           prompt: String.loc("Authorize this transfer")),
+              let mnemonic = await Self.secret(for: address, prompt: String.loc("Authorize this transfer")),
               let seed = BIP39.seedFromMmemonics(mnemonic),
               let keypair = SolanaKey.keypair(fromSeed: seed) else {
             throw WalletError.keystoreUnavailable
@@ -220,9 +242,18 @@ final class WalletStore {
     }
 
     /// The 12-word phrase for a wallet, for the export screen. Guard the call site with Face ID.
-    func mnemonic(for wallet: WalletInfo) -> String? {
-        Keychain.load(key: "wallet.mnemonic.\(wallet.address)",
-                      prompt: String.loc("Reveal your recovery phrase"))
+    func mnemonic(for wallet: WalletInfo) async -> String? {
+        await Self.secret(for: wallet.address, prompt: String.loc("Reveal your recovery phrase"))
+    }
+
+    /// Reads a seed phrase off the main actor. A keychain item behind Face ID
+    /// blocks its thread until the prompt is answered, and on the main actor
+    /// that freezes the interface — long enough and iOS kills the app outright,
+    /// which could happen mid-send.
+    private static func secret(for address: String, prompt: String) async -> String? {
+        await Task.detached {
+            Keychain.load(key: "wallet.mnemonic.\(address)", prompt: prompt)
+        }.value
     }
 
     private func persist() {
@@ -235,10 +266,12 @@ final class WalletStore {
         }
     }
 
-    func loadKeystore() async throws -> BIP32Keystore {
+    /// The reason is what the system biometric prompt shows. It defaults to the
+    /// transfer wording because most callers send coins, but a dapp signature is
+    /// not a transfer and must not claim to be one.
+    func loadKeystore(reason: String = String.loc("Authorize this transfer")) async throws -> BIP32Keystore {
         guard let address = activeAddress,
-              let mnemonic = Keychain.load(key: "wallet.mnemonic.\(address)",
-                                           prompt: String.loc("Authorize this transfer")) else {
+              let mnemonic = await Self.secret(for: address, prompt: reason) else {
             throw WalletError.keystoreUnavailable
         }
         guard let keystore = try await Task.detached(operation: {

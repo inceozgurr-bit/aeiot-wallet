@@ -4670,6 +4670,112 @@
         }
       }
     },
+    "Connecting to other apps": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diğer uygulamalara bağlanma"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conexión con otras apps"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbindung mit anderen Apps"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connexion à d'autres apps"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connessione ad altre app"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ligação a outras apps"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbinding met andere apps"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключение к другим приложениям"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Підключення до інших застосунків"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الاتصال بتطبيقات أخرى"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अन्य ऐप्स से कनेक्ट होना"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terhubung ke aplikasi lain"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การเชื่อมต่อกับแอปอื่น"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kết nối với ứng dụng khác"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接其他应用"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "他のアプリとの接続"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 앱과 연결하기"
+          }
+        }
+      }
+    },
     "Connection Request": {
       "localizations": {
         "tr": {
@@ -4878,6 +4984,112 @@
           "stringUnit": {
             "state": "translated",
             "value": "연락처"
+          }
+        }
+      }
+    },
+    "Contract": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sözleşme"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contrato"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vertrag"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contrat"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contratto"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contrato"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contract"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Контракт"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Контракт"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "العقد"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कॉन्ट्रैक्ट"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontrak"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สัญญา"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hợp đồng"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合约"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コントラクト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "컨트랙트"
           }
         }
       }
@@ -9250,6 +9462,112 @@
         }
       }
     },
+    "Network fee": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ağ ücreti"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comisión de red"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Netzwerkgebühr"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frais de réseau"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commissione di rete"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taxa de rede"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Netwerkkosten"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Комиссия сети"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Комісія мережі"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رسوم الشبكة"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "नेटवर्क फीस"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biaya jaringan"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ค่าธรรมเนียมเครือข่าย"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phí mạng"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网络费"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ネットワーク手数料"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "네트워크 수수료"
+          }
+        }
+      }
+    },
     "Network fee is paid in %1$@ on %2$@.": {
       "localizations": {
         "tr": {
@@ -13186,6 +13504,112 @@
         }
       }
     },
+    "Scroll to the end to read the whole request.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İsteğin tamamını okumak için sona kaydır."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desplázate hasta el final para leer toda la solicitud."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scrolle bis zum Ende, um die ganze Anfrage zu lesen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Faites défiler jusqu'au bout pour lire toute la demande."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scorri fino alla fine per leggere l'intera richiesta."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deslize até ao fim para ler todo o pedido."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scroll naar het einde om het hele verzoek te lezen."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прокрутите до конца, чтобы прочитать весь запрос."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прокрутіть до кінця, щоб прочитати весь запит."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مرّر إلى النهاية لقراءة الطلب كاملًا."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पूरा रिक्वेस्ट पढ़ने के लिए अंत तक स्क्रॉल करें।"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gulir hingga akhir untuk membaca seluruh permintaan."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เลื่อนไปจนสุดเพื่ออ่านคำขอทั้งหมด"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuộn xuống cuối để đọc toàn bộ yêu cầu."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "滚动到底部以阅读完整请求。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リクエスト全文を読むには最後までスクロールしてください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "요청 전체를 읽으려면 끝까지 스크롤하세요."
+          }
+        }
+      }
+    },
     "Sees your wallet address": {
       "localizations": {
         "tr": {
@@ -14464,6 +14888,112 @@
         }
       }
     },
+    "Sign this request": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu isteği imzala"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firma esta solicitud"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Anfrage signieren"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signer cette demande"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firma questa richiesta"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assine este pedido"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onderteken dit verzoek"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подпишите этот запрос"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Підпишіть цей запит"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "توقيع هذا الطلب"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस रिक्वेस्ट को साइन करें"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tanda tangani permintaan ini"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เซ็นคำขอนี้"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ký yêu cầu này"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "签署此请求"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このリクエストに署名"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 요청 서명"
+          }
+        }
+      }
+    },
     "Sign with %@": {
       "localizations": {
         "tr": {
@@ -14676,6 +15206,112 @@
         }
       }
     },
+    "Signing as %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ olarak imzalanıyor"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmando como %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signieren als %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signature en tant que %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firma come %@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A assinar como %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ondertekenen als %@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подпись от имени %@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Підпис від імені %@"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التوقيع باسم %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ के रूप में साइन किया जा रहा है"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menandatangani sebagai %@"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กำลังเซ็นในนาม %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang ký với tư cách %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 %@ 身份签名"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ として署名中"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@(으)로 서명 중"
+          }
+        }
+      }
+    },
     "Signing failed.": {
       "localizations": {
         "tr": {
@@ -14778,6 +15414,112 @@
           "stringUnit": {
             "state": "translated",
             "value": "서명에 실패했습니다."
+          }
+        }
+      }
+    },
+    "Site": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Site"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sitio"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Website"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Site"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sito"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Site"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Site"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сайт"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сайт"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الموقع"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "साइट"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Situs"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เว็บไซต์"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trang web"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网站"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サイト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사이트"
           }
         }
       }
@@ -15846,6 +16588,112 @@
         }
       }
     },
+    "The answer could not be delivered. Try again.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yanıt ulaşamadı. Tekrar dene."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo entregar la respuesta. Inténtalo de nuevo."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Antwort konnte nicht zugestellt werden. Versuche es erneut."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La réponse n'a pas pu être transmise. Réessayez."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile consegnare la risposta. Riprova."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível entregar a resposta. Tente novamente."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het antwoord kon niet worden afgeleverd. Probeer het opnieuw."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось доставить ответ. Попробуйте снова."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не вдалося доставити відповідь. Спробуйте ще раз."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعذّر تسليم الاستجابة. حاول مرة أخرى."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जवाब डिलीवर नहीं हो सका। फिर कोशिश करें।"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Respons tidak dapat dikirim. Coba lagi."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่สามารถส่งคำตอบได้ ลองอีกครั้ง"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể gửi phản hồi. Hãy thử lại."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "响应未能送达，请重试。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "応答を送信できませんでした。もう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "응답을 전송할 수 없습니다. 다시 시도하세요."
+          }
+        }
+      }
+    },
     "The app follows your iPhone language. To change it, go to Settings › AEIOT Wallet › Language.": {
       "extractionState": "stale",
       "localizations": {
@@ -16483,6 +17331,112 @@
         }
       }
     },
+    "The swap was not approved on the network. Nothing was swapped.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Takas ağda onaylanmadı. Hiçbir şey takas edilmedi."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El cambio no fue aprobado en la red. No se cambió nada."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Tausch wurde im Netzwerk nicht genehmigt. Es wurde nichts getauscht."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'échange n'a pas été approuvé sur le réseau. Rien n'a été échangé."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo scambio non è stato approvato sulla rete. Non è stato scambiato nulla."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A troca não foi aprovada na rede. Nada foi trocado."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De wissel is niet goedgekeurd op het netwerk. Er is niets gewisseld."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обмен не был подтверждён в сети. Ничего не было обменяно."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обмін не було підтверджено в мережі. Нічого не було обміняно."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم تتم الموافقة على التبديل في الشبكة. لم يتم تبديل أي شيء."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "नेटवर्क पर स्वैप मंज़ूर नहीं हुआ। कुछ भी स्वैप नहीं हुआ।"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pertukaran tidak disetujui di jaringan. Tidak ada yang ditukar."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การสวอปไม่ได้รับการอนุมัติบนเครือข่าย ไม่มีการสวอปเกิดขึ้น"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giao dịch hoán đổi không được chấp thuận trên mạng. Không có gì được hoán đổi."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "兑换未在网络上获得批准。没有发生任何兑换。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スワップはネットワーク上で承認されませんでした。何もスワップされませんでした。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스왑이 네트워크에서 승인되지 않았습니다. 아무것도 스왑되지 않았습니다."
+          }
+        }
+      }
+    },
     "Theme": {
       "extractionState": "stale",
       "localizations": {
@@ -16590,6 +17544,112 @@
         }
       }
     },
+    "These networks are public. Any address and transaction, including yours, can be viewed by anyone through a block explorer. This is a property of the blockchain, not of this app.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu ağlar herkese açıktır. Seninki dahil her adres ve işlem, bir blok gezgini üzerinden herkes tarafından görüntülenebilir. Bu, uygulamanın değil blok zincirinin bir özelliğidir."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estas redes son públicas. Cualquier dirección y transacción, incluidas las tuyas, puede ser vista por cualquiera a través de un explorador de bloques. Esto es una propiedad de la blockchain, no de esta app."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Netzwerke sind öffentlich. Jede Adresse und Transaktion, einschließlich deiner eigenen, kann von jedem über einen Block-Explorer eingesehen werden. Dies ist eine Eigenschaft der Blockchain, nicht dieser App."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ces réseaux sont publics. Toute adresse et transaction, y compris les vôtres, peut être consultée par n'importe qui via un explorateur de blocs. Ceci est une propriété de la blockchain, pas de cette app."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Queste reti sono pubbliche. Qualsiasi indirizzo e transazione, inclusi i tuoi, può essere visualizzato da chiunque tramite un block explorer. Questa è una caratteristica della blockchain, non di questa app."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estas redes são públicas. Qualquer endereço e transação, incluindo os seus, podem ser vistos por qualquer pessoa num explorador de blocos. Isto é uma característica da blockchain, não desta app."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze netwerken zijn openbaar. Elk adres en elke transactie, ook die van jou, is voor iedereen zichtbaar via een block explorer. Dat is een eigenschap van de blockchain, niet van deze app."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эти сети публичны. Любой адрес и транзакцию, включая ваши, может посмотреть кто угодно через обозреватель блоков. Это свойство блокчейна, а не приложения."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ці мережі публічні. Будь-яку адресу й транзакцію, включно з вашими, може переглянути будь-хто через оглядач блоків. Це властивість блокчейну, а не застосунку."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هذه الشبكات عامة. يمكن لأي شخص عرض أي عنوان ومعاملة، بما في ذلك عنوانك ومعاملاتك، من خلال مستكشف الكتل (block explorer). هذه خاصية للبلوكتشين، وليست خاصية لهذا التطبيق."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ये नेटवर्क पब्लिक हैं। कोई भी ब्लॉक एक्सप्लोरर के ज़रिए किसी भी एड्रेस और ट्रांजैक्शन को देख सकता है, आपका भी। यह ब्लॉकचेन की खासियत है, इस ऐप की नहीं।"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jaringan-jaringan ini bersifat publik. Setiap alamat dan transaksi, termasuk milikmu, bisa dilihat siapa saja melalui block explorer. Ini adalah sifat dari blockchain, bukan dari aplikasi ini."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เครือข่ายเหล่านี้เป็นสาธารณะ ที่อยู่และธุรกรรมใดๆ รวมถึงของคุณ สามารถถูกดูได้โดยทุกคนผ่าน block explorer นี่คือคุณสมบัติของบล็อกเชน ไม่ใช่ของแอปนี้"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Các mạng này là công khai. Bất kỳ ai cũng có thể xem mọi địa chỉ và giao dịch, kể cả của bạn, thông qua một trình khám phá khối (block explorer). Đây là đặc tính của blockchain, không phải của ứng dụng này."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这些网络是公开的。任何人都可以通过区块浏览器查看包括你在内的任何地址和交易。这是区块链本身的特性，而非本应用的行为。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "これらのネットワークは公開されています。あなたのものを含め、あらゆるアドレスと取引はブロックエクスプローラーを通じて誰でも閲覧できます。これはブロックチェーン自体の性質であり、本アプリによるものではありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 네트워크들은 공개되어 있습니다. 사용자의 것을 포함한 모든 주소와 거래는 블록 탐색기를 통해 누구나 볼 수 있습니다. 이는 블록체인 자체의 특성이며, 이 앱의 특성이 아닙니다."
+          }
+        }
+      }
+    },
     "This XRP account is not activated yet.": {
       "localizations": {
         "tr": {
@@ -16692,6 +17752,112 @@
           "stringUnit": {
             "state": "translated",
             "value": "이 XRP 계정은 아직 활성화되지 않았습니다."
+          }
+        }
+      }
+    },
+    "This app is asking you to sign data this wallet cannot read.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu uygulama, bu cüzdanın okuyamadığı bir veriyi imzalamanı istiyor."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta app te está pidiendo que firmes datos que esta billetera no puede leer."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese App bittet dich, Daten zu signieren, die dieses Wallet nicht lesen kann."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette app vous demande de signer des données que ce portefeuille ne peut pas lire."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa app ti sta chiedendo di firmare dati che questo portafoglio non può leggere."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta app está a pedir-lhe que assine dados que esta carteira não consegue ler."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze app vraagt je om gegevens te ondertekenen die deze wallet niet kan lezen."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это приложение просит вас подписать данные, которые этот кошелёк не может прочитать."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей застосунок просить вас підписати дані, які цей гаманець не може прочитати."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يطلب منك هذا التطبيق توقيع بيانات لا تستطيع هذه المحفظة قراءتها."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यह ऐप आपसे ऐसा डेटा साइन करने के लिए कह रहा है जिसे यह वॉलेट पढ़ नहीं सकता।"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aplikasi ini meminta kamu menandatangani data yang tidak bisa dibaca oleh dompet ini."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แอปนี้กำลังขอให้คุณเซ็นข้อมูลที่วอลเล็ตนี้ไม่สามารถอ่านได้"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ứng dụng này đang yêu cầu bạn ký dữ liệu mà ví này không thể đọc được."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此应用要求你为该钱包无法读取的数据签名。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このアプリは、このウォレットが読み取れないデータへの署名を求めています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 앱은 이 지갑이 읽을 수 없는 데이터에 서명하도록 요청하고 있습니다."
           }
         }
       }
@@ -16904,6 +18070,324 @@
           "stringUnit": {
             "state": "translated",
             "value": "이 작업은 이 기기에서 지갑을 제거합니다. 12단어 복구 구문으로만 다시 복원할 수 있습니다."
+          }
+        }
+      }
+    },
+    "This request is for a different wallet than the one you have open.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu istek, şu anda açık olan cüzdandan farklı bir cüzdan için."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta solicitud es para un monedero distinto del que tienes abierto."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Anfrage ist für eine andere Wallet als die, die du gerade geöffnet hast."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette demande concerne un portefeuille différent de celui que vous avez ouvert."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa richiesta riguarda un portafoglio diverso da quello che hai aperto."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este pedido é para uma carteira diferente da que tem aberta."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit verzoek is voor een andere wallet dan die je nu open hebt."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Этот запрос предназначен для другого кошелька, а не того, что у вас сейчас открыт."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей запит призначений для іншого гаманця, а не того, що зараз відкритий у вас."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هذا الطلب مخصص لمحفظة مختلفة عن المحفظة المفتوحة لديك حاليًا."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यह रिक्वेस्ट आपके मौजूदा खुले वॉलेट से अलग वॉलेट के लिए है।"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permintaan ini untuk wallet yang berbeda dari yang sedang kamu buka."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "คำขอนี้มีไว้สำหรับวอลเล็ทอื่นที่ไม่ใช่วอลเล็ทที่คุณเปิดอยู่ตอนนี้"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yêu cầu này dành cho một ví khác với ví bạn đang mở."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此请求对应的钱包与你当前打开的钱包不同。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このリクエストは、現在開いているウォレットとは別のウォレット宛てです。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 요청은 현재 열려 있는 지갑과 다른 지갑을 대상으로 합니다."
+          }
+        }
+      }
+    },
+    "This site could not be verified.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu site doğrulanamadı."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo verificar este sitio."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Website konnte nicht verifiziert werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce site n'a pas pu être vérifié."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile verificare questo sito."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível verificar este site."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze site kon niet worden geverifieerd."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось проверить этот сайт."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не вдалося перевірити цей сайт."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعذّر التحقق من هذا الموقع."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस साइट को सत्यापित नहीं किया जा सका।"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Situs ini tidak dapat diverifikasi."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่สามารถยืนยันเว็บไซต์นี้ได้"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể xác minh trang web này."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法验证此网站。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このサイトを確認できませんでした。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 사이트를 확인할 수 없습니다."
+          }
+        }
+      }
+    },
+    "This site is flagged as fraudulent. Do not sign.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu site dolandırıcılık olarak işaretlendi. İmzalama."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este sitio está marcado como fraudulento. No firmes."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Website wurde als betrügerisch markiert. Nicht signieren."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce site est signalé comme frauduleux. Ne signez pas."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo sito è segnalato come fraudolento. Non firmare."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este site está marcado como fraudulento. Não assine."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze site is gemarkeerd als frauduleus. Niet ondertekenen."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Этот сайт помечен как мошеннический. Не подписывайте."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей сайт позначено як шахрайський. Не підписуйте."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم الإبلاغ عن هذا الموقع كموقع احتيالي. لا توقّع."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस साइट को धोखाधड़ी वाली साइट के रूप में चिह्नित किया गया है। साइन न करें।"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Situs ini ditandai sebagai penipuan. Jangan tanda tangani."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เว็บไซต์นี้ถูกทำเครื่องหมายว่าฉ้อโกง อย่าเซ็น"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trang web này bị gắn cờ là lừa đảo. Không được ký."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此网站已被标记为欺诈网站。请勿签名。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このサイトは詐欺サイトとして報告されています。署名しないでください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 사이트는 사기 사이트로 신고되었습니다. 서명하지 마세요."
           }
         }
       }
@@ -17434,6 +18918,112 @@
           "stringUnit": {
             "state": "translated",
             "value": "잔액과 내역을 표시하기 위해 앱은 사용자의 공개 지갑 주소를 Base 네트워크 노드(mainnet.base.org)와 Blockscout 탐색기(base.blockscout.com)로 전송합니다. 가격을 표시하기 위해 CoinGecko(api.coingecko.com)에서 공개 시장 데이터를 요청합니다. 이 요청에는 이름, 이메일, 기기 식별자가 포함되지 않습니다."
+          }
+        }
+      }
+    },
+    "To show balances and history, the app sends your public wallet addresses to the networks it supports — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, the XRP Ledger and Bitcoin — and to the public explorers that list past transactions. To show prices it requests public market data from CoinGecko. These requests carry no name, e-mail or device identifier.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bakiye ve geçmişi gösterebilmek için uygulama, herkese açık cüzdan adreslerini desteklediği ağlara — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger ve Bitcoin — ve geçmiş işlemleri listeleyen herkese açık gezginlere gönderir. Fiyatlar için CoinGecko'dan herkese açık piyasa verisi ister. Bu isteklerde ad, e-posta veya cihaz kimliği yer almaz."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para mostrar saldos e historial, la app envía tus direcciones públicas a las redes que admite — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger y Bitcoin — y a los exploradores públicos que muestran las transacciones pasadas. Para mostrar los precios, solicita datos públicos de mercado a CoinGecko. Estas solicitudes no incluyen nombre, correo electrónico ni identificador de dispositivo."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um Guthaben und Verlauf anzuzeigen, sendet die App deine öffentlichen Wallet-Adressen an die Netzwerke, die sie unterstützt — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger und Bitcoin — sowie an die öffentlichen Explorer, die vergangene Transaktionen auflisten. Um Preise anzuzeigen, fordert sie öffentliche Marktdaten von CoinGecko an. Diese Anfragen enthalten weder Namen, E-Mail noch Geräte-ID."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pour afficher les soldes et l'historique, l'app envoie vos adresses publiques aux réseaux qu'elle prend en charge — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, le XRP Ledger et Bitcoin — ainsi qu'aux explorateurs publics qui répertorient les transactions passées. Pour afficher les prix, elle demande des données de marché publiques à CoinGecko. Ces requêtes ne contiennent ni nom, ni e-mail, ni identifiant d'appareil."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per mostrare saldi e cronologia, l'app invia i tuoi indirizzi pubblici alle reti che supporta — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger e Bitcoin — e agli explorer pubblici che elencano le transazioni passate. Per mostrare i prezzi, richiede dati di mercato pubblici a CoinGecko. Queste richieste non contengono nome, e-mail o identificativo del dispositivo."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para mostrar saldos e histórico, a app envia os seus endereços públicos às redes que suporta — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger e Bitcoin — e aos exploradores públicos que listam as transações passadas. Para mostrar preços, pede dados públicos de mercado à CoinGecko. Estes pedidos não incluem nome, e-mail nem identificador do dispositivo."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Om saldi en geschiedenis te tonen stuurt de app je openbare adressen naar de netwerken die hij ondersteunt — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger en Bitcoin — en naar de openbare explorers die eerdere transacties tonen. Voor prijzen vraagt hij openbare marktgegevens op bij CoinGecko. Deze verzoeken bevatten geen naam, e-mailadres of apparaat-ID."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чтобы показать балансы и историю, приложение отправляет ваши публичные адреса сетям, которые оно поддерживает, — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger и Bitcoin — и публичным обозревателям, которые показывают прошлые транзакции. Для отображения цен оно запрашивает публичные рыночные данные у CoinGecko. Эти запросы не содержат имени, адреса эл. почты и идентификатора устройства."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Щоб показати баланси та історію, застосунок надсилає ваші публічні адреси мережам, які він підтримує, — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger і Bitcoin — та публічним оглядачам, які показують минулі транзакції. Для показу цін він запитує публічні ринкові дані в CoinGecko. Ці запити не містять імені, адреси ел. пошти чи ідентифікатора пристрою."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لعرض الأرصدة والسجل، يرسل التطبيق عناوين محفظتك العامة إلى الشبكات التي يدعمها (Base، Ethereum، Arbitrum، Optimism، Polygon، BNB Chain، Solana، XRP Ledger، وBitcoin) وإلى المستكشفات العامة التي تعرض المعاملات السابقة. لعرض الأسعار، يطلب بيانات السوق العامة من CoinGecko. لا تحمل هذه الطلبات أي اسم أو بريد إلكتروني أو معرّف جهاز."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बैलेंस और हिस्ट्री दिखाने के लिए, ऐप आपके पब्लिक वॉलेट एड्रेस उन नेटवर्क को भेजता है जिन्हें यह सपोर्ट करता है (Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger और Bitcoin) और उन पब्लिक एक्सप्लोरर्स को जो पिछले लेन-देन दिखाते हैं। कीमतें दिखाने के लिए, यह CoinGecko से पब्लिक मार्केट डेटा मांगता है। इन रिक्वेस्ट्स में कोई नाम, ईमेल या डिवाइस पहचान नहीं होती।"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk menampilkan saldo dan riwayat, aplikasi mengirim alamat wallet publik kamu ke jaringan yang didukungnya — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger, dan Bitcoin — serta ke explorer publik yang mencantumkan transaksi sebelumnya. Untuk menampilkan harga, aplikasi meminta data pasar publik dari CoinGecko. Permintaan ini tidak menyertakan nama, e-mail, atau identitas perangkat apa pun."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพื่อแสดงยอดคงเหลือและประวัติ แอปจะส่งที่อยู่วอลเล็ทสาธารณะของคุณไปยังเครือข่ายที่รองรับ (Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger และ Bitcoin) และไปยัง explorer สาธารณะที่แสดงรายการธุรกรรมในอดีต เพื่อแสดงราคา แอปจะขอข้อมูลตลาดสาธารณะจาก CoinGecko คำขอเหล่านี้ไม่มีการแนบชื่อ อีเมล หรือข้อมูลระบุอุปกรณ์ใดๆ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Để hiển thị số dư và lịch sử giao dịch, ứng dụng gửi các địa chỉ ví công khai của bạn đến các mạng mà ứng dụng hỗ trợ — Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger và Bitcoin — và đến các trình khám phá công khai liệt kê các giao dịch trước đó. Để hiển thị giá, ứng dụng yêu cầu dữ liệu thị trường công khai từ CoinGecko. Các yêu cầu này không mang theo tên, email hay bất kỳ định danh thiết bị nào."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为显示余额和交易记录，应用会将你的公开钱包地址发送到它支持的网络（Base、Ethereum、Arbitrum、Optimism、Polygon、BNB Chain、Solana、XRP Ledger 和 Bitcoin）以及列出历史交易的公开浏览器。为显示价格，应用会向 CoinGecko 请求公开市场数据。这些请求不携带姓名、电子邮件或设备标识符。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "残高と履歴を表示するため、アプリはあなたの公開ウォレットアドレスを、対応するネットワーク（Base、Ethereum、Arbitrum、Optimism、Polygon、BNB Chain、Solana、XRP Ledger、Bitcoin）と、過去の取引を一覧表示する公開エクスプローラーに送信します。価格を表示するため、CoinGeckoに公開市場データをリクエストします。これらのリクエストに氏名、メールアドレス、デバイス識別子は一切含まれません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "잔액과 내역을 표시하기 위해 앱은 지원하는 네트워크(Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, XRP Ledger, Bitcoin)와 과거 거래 내역을 보여주는 공개 탐색기로 사용자의 공개 지갑 주소를 전송합니다. 가격을 표시하기 위해 CoinGecko에서 공개 시장 데이터를 요청합니다. 이 요청에는 이름, 이메일, 기기 식별자가 포함되지 않습니다."
           }
         }
       }
@@ -18285,6 +19875,218 @@
           "stringUnit": {
             "state": "translated",
             "value": "전송은 되돌릴 수 없습니다"
+          }
+        }
+      }
+    },
+    "Type": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tür"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipo"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Typ"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipo"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipo"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тип"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тип"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "النوع"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रकार"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipe"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ประเภท"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loại"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "类型"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タイプ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "유형"
+          }
+        }
+      }
+    },
+    "Unknown app": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilinmeyen uygulama"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App desconocida"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unbekannte App"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App inconnue"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App sconosciuta"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App desconhecida"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onbekende app"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Неизвестное приложение"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Невідомий застосунок"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تطبيق غير معروف"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अज्ञात ऐप"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aplikasi tidak dikenal"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แอปที่ไม่รู้จัก"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ứng dụng không xác định"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未知应用"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不明なアプリ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "알 수 없는 앱"
           }
         }
       }
@@ -19351,6 +21153,112 @@
           "stringUnit": {
             "state": "translated",
             "value": "기기 안에 남는 정보"
+          }
+        }
+      }
+    },
+    "When you connect to an app through WalletConnect, its relay passes encrypted messages between this wallet and that app, and the app is told your wallet address. It can ask you to sign, but every signature needs your approval and your biometrics. Your recovery phrase is never shared.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WalletConnect üzerinden bir uygulamaya bağlandığında, WalletConnect'in rölesi bu cüzdan ile o uygulama arasında şifreli mesajlar iletir ve uygulamaya cüzdan adresin bildirilir. Uygulama imzalamanı isteyebilir, ama her imza onayını ve biyometrik doğrulamanı gerektirir. Kurtarma cümlen asla paylaşılmaz."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando te conectas a una app a través de WalletConnect, su relé transmite mensajes cifrados entre este monedero y esa app, y se informa a la app de tu dirección de monedero. La app puede pedirte que firmes, pero cada firma necesita tu aprobación y tu verificación biométrica. Tu frase de recuperación nunca se comparte."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wenn du dich über WalletConnect mit einer App verbindest, leitet ihr Relay verschlüsselte Nachrichten zwischen dieser Wallet und dieser App weiter, und der App wird deine Wallet-Adresse mitgeteilt. Sie kann dich bitten zu signieren, aber jede Signatur erfordert deine Genehmigung und deine biometrische Bestätigung. Deine Wiederherstellungsphrase wird niemals weitergegeben."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lorsque vous vous connectez à une app via WalletConnect, son relais transmet des messages chiffrés entre ce portefeuille et cette app, et l'app est informée de votre adresse de portefeuille. Elle peut vous demander de signer, mais chaque signature nécessite votre approbation et votre authentification biométrique. Votre phrase de récupération n'est jamais partagée."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando ti connetti a un'app tramite WalletConnect, il suo relay trasmette messaggi cifrati tra questo portafoglio e quell'app, e all'app viene comunicato il tuo indirizzo del portafoglio. Può chiederti di firmare, ma ogni firma richiede la tua approvazione e la tua verifica biometrica. La tua frase di recupero non viene mai condivisa."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando se liga a uma app através da WalletConnect, o seu relay transmite mensagens cifradas entre esta carteira e essa app, e a app é informada do seu endereço de carteira. A app pode pedir-lhe para assinar, mas cada assinatura exige a sua aprovação e a sua verificação biométrica. A sua frase de recuperação nunca é partilhada."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wanneer je via WalletConnect verbinding maakt met een app, geeft de relay ervan versleutelde berichten door tussen deze wallet en die app, en wordt het walletadres aan de app doorgegeven. De app kan je vragen om te ondertekenen, maar elke ondertekening vereist jouw goedkeuring en je biometrische verificatie. Je herstelzin wordt nooit gedeeld."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Когда вы подключаетесь к приложению через WalletConnect, его релей передаёт зашифрованные сообщения между этим кошельком и этим приложением, и приложению сообщается ваш адрес кошелька. Оно может попросить вас подписать, но каждая подпись требует вашего подтверждения и биометрии. Ваша фраза восстановления никогда не передаётся."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Коли ви підключаєтеся до застосунку через WalletConnect, його релей передає зашифровані повідомлення між цим гаманцем і цим застосунком, а застосунку повідомляється адреса вашого гаманця. Він може попросити вас підписати, але кожен підпис вимагає вашого підтвердження та біометрії. Ваша фраза відновлення ніколи не передається."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عندما تتصل بتطبيق عبر WalletConnect، ينقل خادم الترحيل الخاص به رسائل مشفّرة بين هذه المحفظة وذلك التطبيق، ويُخبَر التطبيق بعنوان محفظتك. يمكنه أن يطلب منك التوقيع، لكن كل توقيع يحتاج إلى موافقتك والتحقق البيومتري. عبارة الاسترداد الخاصة بك لا تُشارَك أبدًا."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जब आप WalletConnect के ज़रिए किसी ऐप से कनेक्ट होते हैं, तो उसका रिले इस वॉलेट और उस ऐप के बीच एन्क्रिप्टेड मैसेज भेजता है, और ऐप को आपका वॉलेट एड्रेस बता दिया जाता है। यह आपसे साइन करने के लिए कह सकता है, लेकिन हर साइन के लिए आपकी मंज़ूरी और आपके बायोमेट्रिक की ज़रूरत होती है। आपका रिकवरी फ्रेज़ कभी शेयर नहीं किया जाता।"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saat kamu terhubung ke sebuah aplikasi melalui WalletConnect, relay-nya meneruskan pesan terenkripsi antara wallet ini dan aplikasi tersebut, dan aplikasi tersebut diberi tahu alamat wallet kamu. Aplikasi itu bisa memintamu untuk menandatangani, tetapi setiap tanda tangan selalu memerlukan persetujuan dan verifikasi biometrik kamu. Frasa pemulihan kamu tidak pernah dibagikan."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เมื่อคุณเชื่อมต่อกับแอปผ่าน WalletConnect รีเลย์ของมันจะส่งข้อความที่เข้ารหัสระหว่างวอลเล็ทนี้กับแอปนั้น และแอปจะได้รับแจ้งที่อยู่วอลเล็ทของคุณ แอปอาจขอให้คุณเซ็น แต่การเซ็นทุกครั้งต้องได้รับการอนุมัติและการยืนยันไบโอเมตริกจากคุณเสมอ วลีกู้คืนของคุณจะไม่ถูกแชร์ให้ใครเลย"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khi bạn kết nối với một ứng dụng thông qua WalletConnect, relay của nó chuyển tiếp các tin nhắn được mã hóa giữa ví này và ứng dụng đó, đồng thời ứng dụng được cho biết địa chỉ ví của bạn. Ứng dụng có thể yêu cầu bạn ký, nhưng mỗi chữ ký đều cần có sự chấp thuận và xác thực sinh trắc học của bạn. Cụm từ khôi phục của bạn không bao giờ được chia sẻ."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当你通过 WalletConnect 连接到某个应用时，它的中继会在此钱包与该应用之间传递加密消息，该应用也会被告知你的钱包地址。它可以请求你签名，但每次签名都需要你的批准和生物识别验证。你的助记词绝不会被分享。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WalletConnectを通じてアプリに接続すると、そのリレーがこのウォレットとそのアプリの間で暗号化されたメッセージを中継し、アプリにはあなたのウォレットアドレスが伝えられます。アプリは署名を求めることができますが、すべての署名にはあなたの承認と生体認証が必要です。あなたのリカバリーフレーズが共有されることは決してありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WalletConnect를 통해 앱에 연결하면, 해당 릴레이가 이 지갑과 그 앱 사이에서 암호화된 메시지를 전달하고, 앱에는 사용자의 지갑 주소가 전달됩니다. 앱은 서명을 요청할 수 있지만, 모든 서명에는 사용자의 승인과 생체 인증이 필요합니다. 복구 구문은 절대 공유되지 않습니다."
           }
         }
       }

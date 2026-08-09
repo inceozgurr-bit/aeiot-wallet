@@ -19,6 +19,7 @@ struct SendView: View {
     @State private var showSaveContact = false
     @State private var newContactName = ""
     @State private var showConfirm = false
+    @State private var estimatedFee: Decimal?
 
     /// Digits normalized for parsing: Turkish keyboards produce "," as the decimal separator.
     private var normalizedAmount: String {
@@ -223,6 +224,12 @@ struct SendView: View {
                 // Sending on the wrong network loses the coins, so name it here.
                 confirmRow("Network", token.chain.name)
                 Divider()
+                // A fee spike, or a hostile fee estimate, should be visible
+                // before signing rather than discovered afterwards.
+                confirmRow("Network fee", estimatedFee.map {
+                    "≈ \($0.formatted(.number.precision(.fractionLength(0...8)))) \(token.chain.nativeSymbol)"
+                } ?? "—")
+                Divider()
                 VStack(alignment: .leading, spacing: 6) {
                     Text("To").foregroundStyle(.secondary).font(.subheadline)
                     Text(checksummedRecipient ?? recipient)
@@ -260,6 +267,8 @@ struct SendView: View {
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
         .presentationBackground(.thinMaterial)
+        // Asked for when the sheet opens, so the number is the current one.
+        .task(id: token.id) { estimatedFee = await ChainService.shared.estimatedFee(for: token) }
     }
 
     private func confirmRow(_ label: LocalizedStringKey, _ value: String) -> some View {

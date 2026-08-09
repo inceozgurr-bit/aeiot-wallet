@@ -109,7 +109,11 @@ actor ChainService {
                              gasPrice: BigUInt, keystore: BIP32Keystore, from: EthereumAddress,
                              on chain: Chain) async throws -> String {
         let web3 = try await connection(chain)
-        var tx = CodableTransaction(type: .legacy, to: to, nonce: nonce, chainID: chain.evmChainID ?? 0,
+        // Never fall back to chain 0: that yields a pre-EIP-155 signature, valid
+        // on every EVM chain, so the same transaction could be replayed on one
+        // the user never intended.
+        guard let chainID = chain.evmChainID else { throw WalletError.invalidAddress }
+        var tx = CodableTransaction(type: .legacy, to: to, nonce: nonce, chainID: chainID,
                                     value: value, data: data, gasLimit: 400_000, gasPrice: gasPrice)
         tx.from = from
         guard let pk = try? keystore.UNSAFE_getPrivateKeyData(password: "", account: from) else {
@@ -139,12 +143,24 @@ actor ChainService {
 
     /// How much of `to` you receive for `amountIn` of `from`, via the pool. nil on failure.
     func swapQuote(from: Token, to: Token, amount: String) async throws -> Decimal {
-        let amountIn = amount
+        let out = try await amountOut(from: from, to: to, amount: amount)
+        let formatted = Utilities.formatToPrecision(out, units: .custom(to.decimals), formattingDecimals: 8)
+        return Decimal(string: formatted) ?? 0
+    }
+
+    /// Accept at worst 15% below the quote — the AEIOT pool is small, so honest
+    /// price movement between quote and mining is real.
+    private static let slippageNumerator = 85
+
+    /// The pool's own answer, in the token's smallest unit. Kept as BigUInt so
+    /// the slippage floor never has to survive a trip through a formatted
+    /// string: that rounding could fail and silently leave no floor at all.
+    private func amountOut(from: Token, to: Token, amount: String) async throws -> BigUInt {
         guard from.chain == to.chain, let venue = swapVenue(from.chain) else {
             throw WalletError.invalidAddress
         }
         let web3 = try await connection(from.chain)
-        guard let value = Utilities.parseToBigUInt(amountIn, decimals: from.decimals), value > 0 else {
+        guard let value = Utilities.parseToBigUInt(amount, decimals: from.decimals), value > 0 else {
             throw WalletError.invalidAmount
         }
         let path = swapPath(from: from, to: to, wrapped: venue.wrapped)
@@ -154,12 +170,35 @@ actor ChainService {
         }
         let result = try await op.callContractMethod()
         guard let amounts = result["0"] as? [BigUInt], let out = amounts.last else { throw WalletError.invalidAmount }
-        let formatted = Utilities.formatToPrecision(out, units: .custom(to.decimals), formattingDecimals: 8)
-        return Decimal(string: formatted) ?? 0
+        return out
+    }
+
+    /// Roughly what the network will charge for one transfer, in the chain's own
+    /// coin. Shown before confirming: without a number on screen a fee spike —
+    /// or a hostile fee estimate — burns the balance invisibly.
+    func estimatedFee(for token: Token) async -> Decimal? {
+        switch token.chain.kind {
+        case .evm:
+            guard let web3 = try? await connection(token.chain) else { return nil }
+            let gasPrice = ((try? await web3.eth.gasPrice()) ?? BigUInt(100_000_000)) * 2
+            // A plain transfer costs 21k gas; moving an ERC-20 roughly 65k.
+            let gas = BigUInt(token.contract == nil ? 21_000 : 65_000)
+            let formatted = Utilities.formatToPrecision(gasPrice * gas, units: .ether,
+                                                        formattingDecimals: 8)
+            return Decimal(string: formatted)
+        case .bitcoin:
+            // One input and two outputs, the shape BitcoinService builds.
+            let vsize = Double(10 + 68 + 31 * 2)
+            return Decimal(await BitcoinService.feeRate() * vsize) / 100_000_000
+        case .solana:
+            return Decimal(5_000) / 1_000_000_000
+        case .xrp:
+            return Decimal(12) / 1_000_000
+        }
     }
 
     /// Swaps `amountIn` of `from` for `to` through the Uniswap pool. Handles ERC20 approval.
-    func swap(from: Token, to: Token, amountIn: String, minOut: BigUInt, keystore: BIP32Keystore) async throws -> String {
+    func swap(from: Token, to: Token, amountIn: String, keystore: BIP32Keystore) async throws -> String {
         // Both sides must live on the same chain: this is an in-network swap.
         guard from.chain == to.chain, let venue = swapVenue(from.chain) else {
             throw WalletError.invalidAddress
@@ -170,9 +209,17 @@ actor ChainService {
         guard let value = Utilities.parseToBigUInt(amountIn, decimals: from.decimals), value > 0 else {
             throw WalletError.invalidAmount
         }
+        // Priced at signing time, not when the quote was last shown, and floored
+        // in whole units so no rounding can wipe the protection out. Without a
+        // real floor a sandwich bot can take almost the whole trade.
+        let expected = try await amountOut(from: from, to: to, amount: amountIn)
+        let minOut = expected * BigUInt(Self.slippageNumerator) / 100
+        guard minOut > 0 else { throw WalletError.invalidAmount }
         var nonce = try await web3.eth.getTransactionCount(for: owner, onBlock: .pending)
         let gasPrice = ((try? await web3.eth.gasPrice()) ?? BigUInt(100_000_000)) * 2
-        let deadline = BigUInt(9_999_999_999)
+        // A swap that cannot be mined soon should expire, not sit in the mempool
+        // waiting for a moment when it is profitable to somebody else.
+        let deadline = BigUInt(Date().timeIntervalSince1970 + 20 * 60)
         let path = swapPath(from: from, to: to, wrapped: venue.wrapped)
         let router = venue.router
 
@@ -183,8 +230,14 @@ actor ChainService {
             guard let erc20 = web3.contract(Web3.Utils.erc20ABI, at: tokenAddress),
                   let approveData = erc20.createWriteOperation("approve", parameters: [router, value])?
                       .transaction.data else { throw WalletError.invalidAddress }
-            _ = try await signAndSend(to: tokenAddress, data: approveData, value: 0, nonce: nonce,
-                                      gasPrice: gasPrice, keystore: keystore, from: owner, on: chain)
+            let approveHash = try await signAndSend(to: tokenAddress, data: approveData, value: 0, nonce: nonce,
+                                                    gasPrice: gasPrice, keystore: keystore, from: owner, on: chain)
+            // Sending the swap on the next nonce before the approval is mined
+            // burns gas on a call the router must reject, and on tokens like
+            // USDT a leftover allowance then blocks every later attempt.
+            guard try await waitForConfirmation(hash: approveHash, on: chain) else {
+                throw WalletError.approvalFailed
+            }
             nonce += 1
             let method = to.contract == nil ? "swapExactTokensForETH" : "swapExactTokensForTokens"
             guard let swapData = routerContract.createWriteOperation(

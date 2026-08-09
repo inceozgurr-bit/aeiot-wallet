@@ -36,10 +36,14 @@ final class ScreenGuard {
 enum SecurePasteboard {
     /// Copies with an expiry so an address or recovery phrase does not sit in
     /// the pasteboard for other apps to read hours later.
+    /// Local only: without it the pasteboard syncs through Universal Clipboard,
+    /// which would put a recovery phrase on every Mac and iPad signed into the
+    /// same Apple ID — and the expiry does not stop that, the sync is immediate.
     static func copy(_ text: String, expiresIn seconds: TimeInterval = 60) {
         UIPasteboard.general.setItems(
             [[UTType.plainText.identifier: text]],
-            options: [.expirationDate: Date().addingTimeInterval(seconds)]
+            options: [.expirationDate: Date().addingTimeInterval(seconds),
+                      .localOnly: true]
         )
     }
 }

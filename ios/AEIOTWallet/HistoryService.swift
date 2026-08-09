@@ -211,12 +211,23 @@ enum HistoryService {
             return Activity(
                 chain: chain,
                 hash: item.transaction_hash,
-                symbol: item.token.symbol ?? "?",
+                symbol: safeSymbol(item.token.symbol),
                 amount: amount,
                 isIncoming: item.to.hash.lowercased() == owner,
                 date: date
             )
         }
+    }
+
+    /// A token's symbol is chosen by whoever deployed it, so anyone can airdrop
+    /// a coin whose "symbol" is a phishing line, a lookalike of a real ticker
+    /// written in another alphabet, or text that reorders the row around it.
+    /// Tickers are short and alphanumeric; anything else is not one.
+    private static func safeSymbol(_ raw: String?) -> String {
+        let cleaned = (raw ?? "").unicodeScalars.filter {
+            CharacterSet.alphanumerics.contains($0) && $0.isASCII
+        }
+        return cleaned.isEmpty ? "?" : String(String.UnicodeScalarView(cleaned.prefix(12)))
     }
 
     private struct TransfersResponse: Decodable { let items: [Transfer] }

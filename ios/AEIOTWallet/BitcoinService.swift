@@ -44,16 +44,34 @@ enum BitcoinService {
 
     /// Total across a wallet's addresses. Bitcoin spreads funds over many
     /// addresses, so a single-address balance would understate the wallet.
-    /// Queried in parallel; an address that fails contributes zero.
+    ///
+    /// Queried in small batches: firing all forty at once gets some of them
+    /// rate-limited, and a refused request is indistinguishable from an empty
+    /// address — which showed up as a balance that was quietly too low.
     static func balance(addresses: [String]) async -> Decimal {
-        await withTaskGroup(of: Decimal.self) { group in
-            for address in addresses {
-                group.addTask { (try? await balance(address: address)) ?? 0 }
+        var total = Decimal.zero
+        for start in stride(from: 0, to: addresses.count, by: batchSize) {
+            let batch = addresses[start..<min(start + batchSize, addresses.count)]
+            total += await withTaskGroup(of: Decimal.self) { group in
+                for address in batch {
+                    group.addTask { await retriedBalance(address: address) }
+                }
+                var sum = Decimal.zero
+                for await amount in group { sum += amount }
+                return sum
             }
-            var total = Decimal.zero
-            for await amount in group { total += amount }
-            return total
         }
+        return total
+    }
+
+    private static let batchSize = 8
+
+    /// One retry, because a single dropped response otherwise understates the
+    /// wallet with no sign that anything went wrong.
+    private static func retriedBalance(address: String) async -> Decimal {
+        if let amount = try? await balance(address: address) { return amount }
+        try? await Task.sleep(for: .milliseconds(300))
+        return (try? await balance(address: address)) ?? 0
     }
 
     /// Spendable coins across every address, each paired with the key that can
@@ -82,12 +100,17 @@ enum BitcoinService {
         }
     }
 
-    /// Satoshis per virtual byte for roughly half-hour confirmation.
+    /// Satoshis per virtual byte for roughly half-hour confirmation. Capped:
+    /// the figure comes from a third-party API, and an inflated one would burn
+    /// the balance as miner fees without the sender ever seeing a number.
     static func feeRate() async -> Double {
         guard let estimates: [String: Any] = try? await get("/fee-estimates"),
               let rate = (estimates["3"] ?? estimates["6"]) as? NSNumber else { return 8 }
-        return max(1, rate.doubleValue)
+        return min(max(1, rate.doubleValue), maxFeeRate)
     }
+
+    /// Well above any honest congestion, far below a fee that eats a wallet.
+    static let maxFeeRate: Double = 300
 
     // MARK: Sending
 

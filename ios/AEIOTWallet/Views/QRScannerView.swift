@@ -40,7 +40,9 @@ struct QRScannerView: UIViewControllerRepresentable {
 
         override func viewDidDisappear(_ animated: Bool) {
             super.viewDidDisappear(animated)
-            session.stopRunning()
+            // Blocking, like startRunning: on the main thread it stalls at the
+            // very moment a code is recognised, which reads as a stutter.
+            Task.detached { [session] in session.stopRunning() }
         }
 
         func metadataOutput(_ output: AVCaptureMetadataOutput,
@@ -48,7 +50,9 @@ struct QRScannerView: UIViewControllerRepresentable {
                             from connection: AVCaptureConnection) {
             guard let object = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
                   let value = object.stringValue else { return }
-            session.stopRunning()
+            // Blocking, like startRunning: on the main thread it stalls at the
+            // very moment a code is recognised, which reads as a stutter.
+            Task.detached { [session] in session.stopRunning() }
             onScan?(value)
         }
     }

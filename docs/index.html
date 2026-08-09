@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AEIOT Wallet — Support</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 42rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    color: #111; background: #fff;
+  }
+  @media (prefers-color-scheme: dark) { body { color: #eee; background: #111; } }
+  h1 { font-size: 2rem; margin-bottom: .25rem; }
+  h2 { font-size: 1.15rem; margin-top: 2.25rem; }
+  .lede { color: #666; font-size: 1.05rem; }
+  @media (prefers-color-scheme: dark) { .lede { color: #aaa; } }
+  a { color: #c8102e; }
+  dt { font-weight: 600; margin-top: 1.1rem; }
+  dd { margin: .3rem 0 0; }
+</style>
+</head>
+<body>
+
+<h1>AEIOT Wallet</h1>
+<p class="lede">A self-custody wallet for iPhone. Your keys and your recovery
+phrase are created on your device and never leave it.</p>
+
+<h2>Support</h2>
+<p>Questions, bug reports and anything else:
+<a href="mailto:ince.ozgurr@gmail.com">ince.ozgurr@gmail.com</a></p>
+
+<h2>Common questions</h2>
+<dl>
+  <dt>I lost my phone. Can you recover my wallet?</dt>
+  <dd>No — and nobody else can either. That is what self-custody means. Your
+  wallet lives in your 12-word recovery phrase: enter it in a new install and
+  everything comes back. Without it, the coins are unreachable, permanently.</dd>
+
+  <dt>Where is my recovery phrase stored?</dt>
+  <dd>In the iPhone's Keychain, on that device only, behind Face ID or Touch ID.
+  It is never uploaded, and the app has no server to upload it to.</dd>
+
+  <dt>I re-enrolled Face ID and the wallet will not open.</dt>
+  <dd>That is deliberate. Changing the enrolled face or fingerprint invalidates
+  access to the stored phrase, so that someone who knows your passcode cannot
+  add their own face and read it. Restore with your 12 words.</dd>
+
+  <dt>Which networks does it support?</dt>
+  <dd>Base, Ethereum, Arbitrum, Optimism, Polygon, BNB Chain, Solana, the XRP
+  Ledger and Bitcoin. The six EVM networks share one address; Solana, XRP and
+  Bitcoin each have their own.</dd>
+
+  <dt>What is AEIOT?</dt>
+  <dd>A fixed-supply ERC-20 token on Base, total supply 1,150,115, with no way
+  to create more. It carries no promise of value or return.</dd>
+
+  <dt>A transfer has not arrived.</dt>
+  <dd>Check the transaction on a block explorer using the link in the app.
+  Transfers cannot be cancelled or reversed once sent, including transfers to a
+  wrong address.</dd>
+</dl>
+
+<h2>Privacy</h2>
+<p><a href="privacy.html">Privacy Policy</a> — no accounts, no analytics, no
+tracking.</p>
+
+</body>
+</html>

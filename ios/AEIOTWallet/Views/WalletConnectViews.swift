@@ -4,10 +4,12 @@ import SwiftUI
 /// A dapp asking to connect. Approving only exposes the wallet address — it
 /// grants no authority to move anything, which the sheet says plainly.
 struct ConnectionRequestSheet: View {
-    let proposal: Session.Proposal
+    let pending: WalletConnectService.Pending<Session.Proposal>
     @Environment(WalletStore.self) private var wallet
     @Environment(\.dismiss) private var dismiss
     @State private var working = false
+
+    private var proposal: Session.Proposal { pending.body }
 
     var body: some View {
         VStack(spacing: 20) {
@@ -16,6 +18,14 @@ struct ConnectionRequestSheet: View {
             VStack(spacing: 6) {
                 Text(proposal.proposer.name).font(.title2.bold()).oneLine()
                 Text(proposal.proposer.url).font(.footnote).foregroundStyle(.secondary).oneLine()
+            }
+
+            if pending.isScam {
+                Label("This site is flagged as fraudulent. Do not sign.", systemImage: "hand.raised.fill")
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(Color.appAccent)
+                    .padding(10)
+                    .background(Color.appAccent.opacity(0.12), in: .rect(cornerRadius: 10))
             }
 
             VStack(alignment: .leading, spacing: 10) {
@@ -73,25 +83,58 @@ struct ConnectionRequestSheet: View {
 /// A dapp asking for a signature. The payload is shown in full before anything
 /// is signed, and signing always goes through a fresh biometric check.
 struct SignatureRequestSheet: View {
-    let request: Request
+    let pending: WalletConnectService.Pending<Request>
     @Environment(WalletStore.self) private var wallet
     @Environment(\.dismiss) private var dismiss
     @State private var working = false
     @State private var error: String?
+    @State private var reachedEnd = false
+
+    private var request: Request { pending.body }
+    private var message: String { WalletConnectService.readableMessage(for: request) }
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 14) {
             Text("Signature Request").font(.headline)
-            Text(request.method).font(.footnote.monospaced()).foregroundStyle(.secondary).oneLine()
+
+            // Who is asking, and whether the relay could vouch for them. Without
+            // this the same sheet appears for a real site and for a clone of it.
+            VStack(spacing: 4) {
+                Text(WalletConnectService.shared.dappName(for: request))
+                    .font(.subheadline.bold()).oneLine()
+                Text(request.method).font(.caption.monospaced()).foregroundStyle(.secondary).oneLine()
+            }
+
+            if pending.isScam {
+                warning("This site is flagged as fraudulent. Do not sign.", icon: "hand.raised.fill")
+            } else if pending.isSuspicious {
+                warning("This site could not be verified.", icon: "questionmark.circle")
+            }
 
             ScrollView {
-                Text(WalletConnectService.readableMessage(for: request))
+                Text(message)
                     .font(.footnote.monospaced())
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .textSelection(.enabled)
+                // Marks the end of the payload. A long one can push the line
+                // that actually matters below the fold, so signing stays
+                // disabled until this has been reached.
+                Color.clear.frame(height: 1)
+                    .onAppear { reachedEnd = true }
             }
-            .frame(maxHeight: 220)
+            .frame(maxHeight: 200)
             .glassCard()
+
+            if !reachedEnd {
+                Label("Scroll to the end to read the whole request.", systemImage: "arrow.down")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let address = wallet.activeAddress {
+                Text("Signing as \(shortAddress(address))")
+                    .font(.caption).foregroundStyle(.secondary).oneLine()
+            }
 
             Label("Only sign this if you asked the app for it.", systemImage: "exclamationmark.triangle")
                 .font(.caption)
@@ -112,7 +155,7 @@ struct SignatureRequestSheet: View {
                         .frame(maxWidth: .infinity).padding(.vertical, 6).oneLine()
                 }
                 .buttonStyle(.glassProminent)
-                .disabled(working)
+                .disabled(working || !reachedEnd)
 
                 Button {
                     Haptic.tap()
@@ -132,13 +175,33 @@ struct SignatureRequestSheet: View {
         Task {
             do {
                 let result = try await WalletConnectService.shared.sign(request, using: wallet)
-                await WalletConnectService.shared.respond(request, result: result)
-                dismiss()
+                // Only leave once the dapp actually has the answer; otherwise the
+                // user would believe they signed while the app received nothing.
+                if await WalletConnectService.shared.respond(request, result: result) {
+                    dismiss()
+                } else {
+                    error = String.loc("The answer could not be delivered. Try again.")
+                    working = false
+                }
             } catch {
                 self.error = error.localizedDescription
                 working = false
             }
         }
+    }
+
+    private func warning(_ text: LocalizedStringKey, icon: String) -> some View {
+        Label(text, systemImage: icon)
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(Color.appAccent)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(10)
+            .background(Color.appAccent.opacity(0.12), in: .rect(cornerRadius: 10))
+    }
+
+    private func shortAddress(_ a: String) -> String {
+        guard a.count > 12 else { return a }
+        return "\(a.prefix(8))…\(a.suffix(6))"
     }
 }
 

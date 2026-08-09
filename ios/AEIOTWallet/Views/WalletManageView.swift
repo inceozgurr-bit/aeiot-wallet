@@ -56,9 +56,17 @@ struct WalletManageView: View {
             .alert("Delete Wallet?", isPresented: .init(
                 get: { toDelete != nil }, set: { if !$0 { toDelete = nil } })) {
                 Button("Delete", role: .destructive) {
-                    if let toDelete { wallet.remove(toDelete) }
+                    // This destroys the only copy of a seed on this device, so
+                    // it asks for the same proof as spending from it.
+                    let target = toDelete
                     toDelete = nil
-                    if wallet.wallets.isEmpty { dismiss() }
+                    Task {
+                        guard let target,
+                              await wallet.authenticate(reason: String.loc("Delete Wallet?"))
+                        else { return }
+                        wallet.remove(target)
+                        if wallet.wallets.isEmpty { dismiss() }
+                    }
                 }
                 Button("Cancel", role: .cancel) { toDelete = nil }
             } message: {
@@ -83,6 +91,18 @@ struct WalletManageView: View {
     }
 }
 
+/// ShareLink wants its item up front, which would mean writing the phrase to
+/// disk before the user asks to share it. This presents the sheet on demand.
+private struct ShareSheet: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: [url], applicationActivities: nil)
+    }
+
+    func updateUIViewController(_: UIActivityViewController, context: Context) {}
+}
+
 struct WalletExportView: View {
     @Environment(WalletStore.self) private var walletStore
     let wallet: WalletInfo
@@ -90,8 +110,16 @@ struct WalletExportView: View {
     @State private var phrase: String?
     @State private var revealed = false
     @State private var copied = false
+    @State private var exportFile: ExportFile?
+    @State private var screenGuard = ScreenGuard()
 
     private var copyKey: LocalizedStringKey { copied ? "Copied" : "Copy" }
+
+    /// A URL is not Identifiable, and the share sheet needs one item to key on.
+    private struct ExportFile: Identifiable {
+        let id = UUID()
+        let url: URL
+    }
 
     var body: some View {
         VStack(spacing: 20) {
@@ -123,6 +151,9 @@ struct WalletExportView: View {
                         .glassEffect(.regular, in: .rect(cornerRadius: 8))
                     }
                 }
+                // The onboarding backup screen already hides itself from screen
+                // recording; the same words are on this one.
+                .hiddenWhileRecording(screenGuard)
                 HStack(spacing: 20) {
                     Button {
                         Haptic.tap()
@@ -132,13 +163,20 @@ struct WalletExportView: View {
                         Label(copyKey, systemImage: copied ? "checkmark" : "doc.on.doc")
                             .font(.subheadline).oneLine()
                     }
-                    if let pdf = pdfURL(phrase: phrase) {
-                        ShareLink(item: pdf) {
-                            Label("Export PDF", systemImage: "square.and.arrow.up")
-                                .font(.subheadline).oneLine()
+                    Button {
+                        Haptic.tap()
+                        // Written only when asked for: the sheet used to render a
+                        // plaintext copy of the phrase to disk just for being on
+                        // screen, and left it there.
+                        if let url = writeRecoverySheet(phrase: phrase) {
+                            exportFile = ExportFile(url: url)
                         }
+                    } label: {
+                        Label("Export PDF", systemImage: "square.and.arrow.up")
+                            .font(.subheadline).oneLine()
                     }
                 }
+                .hiddenWhileRecording(screenGuard)
             } else {
                 Button {
                     Haptic.tap()
@@ -158,22 +196,32 @@ struct WalletExportView: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .presentationBackground(.thinMaterial)
+        // The file carries the phrase in the clear, so it lives only as long as
+        // the share sheet that needs it.
+        .sheet(item: $exportFile, onDismiss: discardExport) { ShareSheet(url: $0.url) }
+        .onDisappear(perform: discardExport)
+    }
+
+    private func discardExport() {
+        if let exportFile { try? FileManager.default.removeItem(at: exportFile.url) }
+        exportFile = nil
     }
 
     private func reveal() {
         Task {
             guard await walletStore.authenticate(reason: String.loc("Reveal your recovery phrase")) else { return }
-            phrase = walletStore.mnemonic(for: wallet)
+            phrase = await walletStore.mnemonic(for: wallet)
             revealed = phrase != nil
         }
     }
 
     /// Renders a one-page recovery sheet PDF to a temp file and returns its URL.
-    private func pdfURL(phrase: String) -> URL? {
+    /// The wallet name is user text, so it never reaches the path.
+    private func writeRecoverySheet(phrase: String) -> URL? {
         let page = CGRect(x: 0, y: 0, width: 595, height: 842) // A4 @72dpi
         let renderer = UIGraphicsPDFRenderer(bounds: page)
         let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("AEIOT-\(wallet.name).pdf")
+            .appendingPathComponent("AEIOT-recovery-\(UUID().uuidString).pdf")
         do {
             try renderer.writePDF(to: url) { ctx in
                 ctx.beginPage()
@@ -206,6 +254,11 @@ struct WalletExportView: View {
                     withAttributes: [.font: UIFont.systemFont(ofSize: 11),
                                      .foregroundColor: UIColor(Color.appAccent)])
             }
+            // Default protection lets anything reach the file once the device
+            // has been unlocked a single time since boot; these words deserve
+            // the class that stays sealed whenever the phone is locked.
+            try FileManager.default.setAttributes(
+                [.protectionKey: FileProtectionType.complete], ofItemAtPath: url.path)
             return url
         } catch { return nil }
     }

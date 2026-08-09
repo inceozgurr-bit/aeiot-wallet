@@ -15,9 +15,25 @@ final class WalletConnectService {
     /// Sessions currently approved.
     private(set) var sessions: [Session] = []
     /// A dapp asking to connect; the UI shows a sheet while this is set.
-    var proposal: Session.Proposal?
+    var proposal: Pending<Session.Proposal>?
     /// A dapp asking for a signature.
-    var request: Request?
+    var request: Pending<Request>?
+
+    /// Whatever the dapp sent, carried together with the relay's own verdict on
+    /// the origin that sent it. Keeping them in one value means the screen can
+    /// never show one request's text above another request's provenance.
+    struct Pending<Body> {
+        let body: Body
+        let verified: VerifyContext?
+
+        /// The relay could not vouch for this origin, or actively flagged it.
+        var isSuspicious: Bool {
+            guard let validation = verified?.validation else { return true }
+            return validation != .valid
+        }
+
+        var isScam: Bool { verified?.validation == .scam }
+    }
     /// Surfaced to the user when a pairing or response fails.
     var failure: String?
 
@@ -51,14 +67,21 @@ final class WalletConnectService {
             crypto: WalletCrypto()
         )
 
+        // The second value is the relay's origin verification — the SDK's own
+        // phishing defence. Dropping it is how a wallet ends up showing a
+        // flagged site exactly like a legitimate one.
         WalletKit.instance.sessionProposalPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] proposal, _ in self?.proposal = proposal }
+            .sink { [weak self] proposal, context in
+                self?.proposal = Pending(body: proposal, verified: context)
+            }
             .store(in: &cancellables)
 
         WalletKit.instance.sessionRequestPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] request, _ in self?.request = request }
+            .sink { [weak self] request, context in
+                self?.request = Pending(body: request, verified: context)
+            }
             .store(in: &cancellables)
 
         WalletKit.instance.sessionsPublisher
@@ -73,7 +96,12 @@ final class WalletConnectService {
     /// pairing URI is ignored rather than reported, since the same scanner also
     /// reads plain recipient addresses.
     func pair(_ scanned: String) async {
-        guard let uri = WalletConnectURI(string: scanned) else { return }
+        // A scanned code is a bare `wc:` URI, but a deep link arrives wrapped as
+        // `aeiot://wc?uri=…`. The plain parser rejects the wrapped form, so
+        // links from a dapp used to be swallowed in silence.
+        let uri = WalletConnectURI(string: scanned)
+            ?? URL(string: scanned).flatMap { try? WalletConnectURI(deeplinkUri: $0) }
+        guard let uri else { return }
         do {
             try await WalletKit.instance.pair(uri: uri)
         } catch {
@@ -81,12 +109,17 @@ final class WalletConnectService {
         }
     }
 
+    /// An approval that fails leaves the dapp waiting forever unless it is told,
+    /// so a failure here is turned into an explicit rejection.
     func approve(_ proposal: Session.Proposal, address: String) async {
         do {
             let namespaces = try AutoNamespaces.build(
                 sessionProposal: proposal,
                 chains: Self.requestedChains(in: proposal),
-                methods: Array(proposal.requiredNamespaces.values.flatMap(\.methods)),
+                // Our own list, not the dapp's: handing back what it asked for
+                // advertised support for eth_sign and wallet_addEthereumChain,
+                // the very methods this wallet refuses.
+                methods: Self.supportedMethods,
                 events: Array(proposal.requiredNamespaces.values.flatMap(\.events)),
                 accounts: Self.requestedChains(in: proposal).compactMap {
                     Account(blockchain: $0, address: address)
@@ -95,6 +128,7 @@ final class WalletConnectService {
             _ = try await WalletKit.instance.approve(proposalId: proposal.id, namespaces: namespaces)
         } catch {
             failure = error.localizedDescription
+            try? await WalletKit.instance.rejectSession(proposalId: proposal.id, reason: .userRejected)
         }
         self.proposal = nil
     }
@@ -112,24 +146,35 @@ final class WalletConnectService {
         }
     }
 
-    /// Answers a signing request with a result the dapp can use.
-    func respond(_ request: Request, result: String) async {
+    /// Answers a signing request with a result the dapp can use. Returns false
+    /// if the answer never reached the relay: the signature exists but the dapp
+    /// did not get it, so the sheet must stay up rather than imply success.
+    @discardableResult
+    func respond(_ request: Request, result: String) async -> Bool {
         do {
             try await WalletKit.instance.respond(topic: request.topic,
                                                  requestId: request.id,
                                                  response: .response(AnyCodable(result)))
+            self.request = nil
+            return true
         } catch {
             failure = error.localizedDescription
+            return false
         }
-        self.request = nil
     }
 
     /// Turns the dapp down. Also used for the methods we deliberately refuse.
+    /// The request is cleared either way — a rejection the user already made
+    /// should not come back — but a delivery failure is surfaced.
     func decline(_ request: Request, reason: String = "User rejected") async {
-        try? await WalletKit.instance.respond(
-            topic: request.topic,
-            requestId: request.id,
-            response: .error(JSONRPCError(code: 4001, message: reason)))
+        do {
+            try await WalletKit.instance.respond(
+                topic: request.topic,
+                requestId: request.id,
+                response: .error(JSONRPCError(code: 4001, message: reason)))
+        } catch {
+            failure = error.localizedDescription
+        }
         self.request = nil
     }
 
@@ -143,7 +188,17 @@ final class WalletConnectService {
     /// what forces a fresh Face ID prompt every single time — an approved
     /// session is permission to ask, never permission to sign.
     func sign(_ request: Request, using wallet: WalletStore) async throws -> String {
-        let keystore = try await wallet.loadKeystore()
+        // Checked before the keystore is touched: asking for Face ID and only
+        // then refusing trains the user to approve prompts the wallet cannot
+        // honour anyway.
+        guard Self.supportedMethods.contains(request.method) else {
+            throw WalletConnectError.unsupportedMethod(request.method)
+        }
+        // The dapp names the account it expects to sign with. If the user
+        // switched wallets after connecting, signing with the current one hands
+        // back a signature from a key the dapp never asked for.
+        try requireExpectedAccount(request, active: wallet.activeAddress)
+        let keystore = try await wallet.loadKeystore(reason: String.loc("Sign this request"))
         guard let address = keystore.addresses?.first else { throw WalletError.keystoreUnavailable }
 
         switch request.method {
@@ -170,28 +225,92 @@ final class WalletConnectService {
         }
     }
 
+    /// The address a request is meant for: `personal_sign` puts it second,
+    /// typed data first. Anything that is not a 0x address is ignored, so a dapp
+    /// that omits it is not blocked — only a genuine mismatch is.
+    private func requireExpectedAccount(_ request: Request, active: String?) throws {
+        guard let params = try? request.params.get([String].self),
+              let expected = params.first(where: { $0.hasPrefix("0x") && $0.count == 42 })
+        else { return }
+        guard let active, expected.lowercased() == active.lowercased() else {
+            throw WalletConnectError.wrongAccount
+        }
+    }
+
     /// Both CryptoSwift and web3swift define `toHexString()`, so spelling it out
     /// avoids an ambiguous call.
     private static func hex(_ data: Data) -> String {
         "0x" + data.map { String(format: "%02x", $0) }.joined()
     }
 
-    /// What the confirmation sheet shows the user before they approve. Nothing
-    /// here is trusted — it is the dapp's own text, rendered as text.
+    /// What the confirmation sheet shows before the user approves. Nothing here
+    /// is trusted: it is the dapp's own text, flattened to something a person
+    /// can actually read, with control characters made visible so a payload
+    /// cannot reorder or hide itself on screen.
     static func readableMessage(for request: Request) -> String {
         switch request.method {
         case "personal_sign":
             guard let params = try? request.params.get([String].self), let raw = params.first
             else { return request.method }
             if let data = Data.fromHex(raw), let text = String(data: data, encoding: .utf8) {
-                return text
+                return sanitized(text)
             }
-            return raw
+            // Not readable text: an opaque digest. Say so rather than showing
+            // hex that means nothing to the person approving it.
+            return String.loc("This app is asking you to sign data this wallet cannot read.")
         case "eth_signTypedData", "eth_signTypedData_v4":
-            return (try? request.params.get([String].self))?.last ?? request.method
+            guard let json = (try? request.params.get([String].self))?.last else { return request.method }
+            return sanitized(typedDataSummary(json) ?? json)
         default:
             return request.method
         }
+    }
+
+    /// Pulls the parts of an EIP-712 payload that decide what is being agreed
+    /// to, so a permit does not arrive disguised as a wall of JSON.
+    private static func typedDataSummary(_ json: String) -> String? {
+        guard let data = json.data(using: .utf8),
+              let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else { return nil }
+        var lines: [String] = []
+        if let primaryType = root["primaryType"] as? String {
+            lines.append("\(String.loc("Type")): \(primaryType)")
+        }
+        if let domain = root["domain"] as? [String: Any] {
+            if let name = domain["name"] as? String { lines.append("\(String.loc("Site")): \(name)") }
+            if let contract = domain["verifyingContract"] as? String {
+                lines.append("\(String.loc("Contract")): \(contract)")
+            }
+            if let chain = domain["chainId"] {
+                let id = (chain as? NSNumber)?.stringValue ?? "\(chain)"
+                let known = Chain.all.first { chain in
+                    guard case let .evm(chainID) = chain.kind else { return false }
+                    return String(chainID) == id
+                }
+                lines.append("\(String.loc("Network")): \(known?.name ?? id)")
+            }
+        }
+        if let message = root["message"] as? [String: Any] {
+            // Spender and amount are what a drain actually needs; surface them
+            // above the rest of the payload whenever the dapp includes them.
+            for key in ["spender", "to", "value", "amount", "deadline"] where message[key] != nil {
+                lines.append("\(key): \(message[key]!)")
+            }
+        }
+        guard !lines.isEmpty else { return nil }
+        return lines.joined(separator: "\n") + "\n\n" + json
+    }
+
+    /// Bidirectional overrides and zero-width characters can make a payload read
+    /// as something other than what gets signed.
+    private static func sanitized(_ text: String) -> String {
+        let hostile = Set<Character>("\u{202A}\u{202B}\u{202C}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{2069}\u{200B}\u{200C}\u{200D}\u{FEFF}")
+        return String(text.map { hostile.contains($0) ? "\u{FFFD}" : $0 })
+    }
+
+    /// The connected app a request belongs to, so the signing sheet can name it.
+    func dappName(for request: Request) -> String {
+        sessions.first { $0.topic == request.topic }?.peer.name ?? String.loc("Unknown app")
     }
 
     /// Only the chains this wallet actually holds keys for, so a proposal asking
@@ -224,7 +343,16 @@ private final class RelaySocket: NSObject, WebSocketConnecting, URLSessionWebSoc
     var request: URLRequest
 
     private var task: URLSessionWebSocketTask?
-    private lazy var session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+    /// Recreated after each disconnect, since invalidating is what releases the
+    /// session's strong reference to this delegate.
+    private var session: URLSession?
+
+    private var liveSession: URLSession {
+        if let session { return session }
+        let created = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        session = created
+        return created
+    }
 
     init(url: URL) {
         request = URLRequest(url: url)
@@ -232,7 +360,10 @@ private final class RelaySocket: NSObject, WebSocketConnecting, URLSessionWebSoc
     }
 
     func connect() {
-        task = session.webSocketTask(with: request)
+        // The relay retries by calling connect() again; without dropping the old
+        // task it stays alive alongside the new one and both keep reading.
+        task?.cancel(with: .goingAway, reason: nil)
+        task = liveSession.webSocketTask(with: request)
         task?.resume()
         receiveNext()
     }
@@ -241,6 +372,11 @@ private final class RelaySocket: NSObject, WebSocketConnecting, URLSessionWebSoc
         task?.cancel(with: .goingAway, reason: nil)
         task = nil
         isConnected = false
+        // URLSession holds its delegate — this object — until invalidated, so
+        // without this the socket and its connection pool live until the app
+        // exits. A fresh session is created on the next connect().
+        session?.finishTasksAndInvalidate()
+        session = nil
     }
 
     func write(string: String, completion: (() -> Void)?) {
@@ -302,12 +438,14 @@ enum WalletConnectError: LocalizedError {
     case malformedRequest
     case signingFailed
     case unsupportedMethod(String)
+    case wrongAccount
 
     var errorDescription: String? {
         switch self {
         case .malformedRequest: String.loc("The app sent a request this wallet could not read.")
         case .signingFailed: String.loc("Signing failed.")
         case .unsupportedMethod(let method): String.loc("This wallet does not support \(method).")
+        case .wrongAccount: String.loc("This request is for a different wallet than the one you have open.")
         }
     }
 }

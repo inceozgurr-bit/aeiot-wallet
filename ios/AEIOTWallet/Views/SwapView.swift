@@ -171,6 +171,11 @@ struct SwapView: View {
 
     private func refreshQuote() async {
         guard !normalizedAmount.isEmpty, Decimal(string: normalizedAmount) ?? 0 > 0 else { quote = nil; return }
+        // Typing "1000" used to fire four separate on-chain calls. The task is
+        // keyed on the amount, so a newer keystroke cancels this sleep before it
+        // ever reaches the network.
+        try? await Task.sleep(for: .milliseconds(400))
+        guard !Task.isCancelled else { return }
         quote = try? await ChainService.shared.swapQuote(from: fromToken, to: toToken, amount: normalizedAmount)
     }
 
@@ -183,14 +188,8 @@ struct SwapView: View {
             }
             do {
                 let keystore = try await wallet.loadKeystore()
-                // 15% slippage tolerance — the pool is small, so quotes move fast.
-                let out = quote ?? 0
-                let minOutDecimal = out * Decimal(0.85)
-                let minOut = Utilities.parseToBigUInt(
-                    minOutDecimal.formatted(.number.precision(.fractionLength(0...18)).grouping(.never)),
-                    decimals: toToken.decimals) ?? 0
                 txHash = try await ChainService.shared.swap(
-                    from: fromToken, to: toToken, amountIn: normalizedAmount, minOut: minOut, keystore: keystore)
+                    from: fromToken, to: toToken, amountIn: normalizedAmount, keystore: keystore)
             } catch {
                 errorMessage = error.localizedDescription
             }

@@ -28,9 +28,15 @@ enum Keychain {
         let biometryAvailable = requireBiometry
         #endif
 
+        // .biometryCurrentSet, not .userPresence: the latter accepts the device
+        // passcode, so a thief who watched it being typed could read the
+        // recovery phrase outright. This also invalidates the item if a face or
+        // fingerprint is enrolled later, which is that same attack via Settings.
+        // The trade-off is deliberate — re-enrolling Face ID then means
+        // restoring from the 12 words, which self-custody requires anyway.
         if biometryAvailable,
            let acl = SecAccessControlCreateWithFlags(
-               nil, kSecAttrAccessibleWhenUnlockedThisDeviceOnly, .userPresence, nil) {
+               nil, kSecAttrAccessibleWhenUnlockedThisDeviceOnly, .biometryCurrentSet, nil) {
             attrs[kSecAttrAccessControl as String] = acl
         } else {
             attrs[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly

@@ -2,17 +2,42 @@ import Foundation
 import BigInt
 
 enum PriceService {
-    /// USD prices keyed by CoinGecko id. Returns empty on any failure — prices are cosmetic.
+    /// Holds the last good answer. CoinGecko's free tier rate-limits easily and
+    /// every pull-to-refresh asked again: one refusal used to blank every dollar
+    /// value and the total balance at once.
+    private actor Cache {
+        private var prices: [String: Double] = [:]
+        private var storedAt = Date.distantPast
+
+        func fresh(within seconds: TimeInterval) -> [String: Double]? {
+            Date().timeIntervalSince(storedAt) < seconds && !prices.isEmpty ? prices : nil
+        }
+
+        func store(_ new: [String: Double]) {
+            prices = new
+            storedAt = Date()
+        }
+
+        /// Used when the network says no: a slightly stale price beats a blank.
+        func lastKnown() -> [String: Double] { prices }
+    }
+
+    private static let cache = Cache()
+
+    /// USD prices keyed by CoinGecko id, falling back to the last known values.
     static func usdPrices(for tokens: [Token]) async -> [String: Double] {
+        if let cached = await cache.fresh(within: 60) { return cached }
         // The same coin appears on several networks; ask CoinGecko for it once.
         let ids = Set(tokens.compactMap(\.coingeckoID)).sorted().joined(separator: ",")
         guard !ids.isEmpty,
               let url = URL(string: "https://api.coingecko.com/api/v3/simple/price?ids=\(ids)&vs_currencies=usd"),
               let (data, _) = try? await URLSession.shared.data(from: url),
               let decoded = try? JSONDecoder().decode([String: [String: Double]].self, from: data) else {
-            return [:]
+            return await cache.lastKnown()
         }
-        return decoded.compactMapValues { $0["usd"] }
+        let prices = decoded.compactMapValues { $0["usd"] }
+        await cache.store(prices)
+        return prices
     }
 
     /// Price history for a coin over `days` (1, 7, 30, 365). Empty on failure.

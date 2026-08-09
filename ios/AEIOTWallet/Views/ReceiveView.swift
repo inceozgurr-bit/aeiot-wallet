@@ -122,11 +122,16 @@ struct ReceiveView: View {
         }
     }
 
+    /// A CIContext allocates a Metal device and command queue, so building one
+    /// per call — from a body that redraws on every network switch and every
+    /// "Copied" flash — was the most expensive thing on this screen.
+    private static let ciContext = CIContext()
+
     private func qrImage(for text: String) -> UIImage? {
         let filter = CIFilter.qrCodeGenerator()
         filter.message = Data(text.utf8)
         guard let output = filter.outputImage?.transformed(by: CGAffineTransform(scaleX: 10, y: 10)),
-              let cgImage = CIContext().createCGImage(output, from: output.extent) else { return nil }
+              let cgImage = Self.ciContext.createCGImage(output, from: output.extent) else { return nil }
         return UIImage(cgImage: cgImage)
     }
 }
